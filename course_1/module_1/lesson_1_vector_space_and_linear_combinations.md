@@ -8,13 +8,13 @@ In Machine Learning, data is almost always represented as vectors. If you are pr
 
 A **vector** is an object that has both magnitude and direction, usually written as:
 
-> **v** = [v1, v2, v3, ..., vn]
+> **v** = [v₁, v₂, v₃, ..., vₙ]
 
 1. **Vector Addition:** You add vectors element-wise. Geometrically, this is the "tip-to-tail" method.
 2. **Scalar Multiplication:** Multiplying a vector by a number (a scalar) stretches or shrinks it.
 3. **Linear Combination:** This is the most critical part of ML. It is the sum of scaled vectors:
 
-> **W** = c1 **v1** + c2 **v2**
+> **W** = c₁**v₁** + c₂**v₂**
 
 ---
 
@@ -40,7 +40,7 @@ Adding multiple vectors follows the **Associative** and **Commutative** properti
 
 If we have three vectors **u**, **v**, and **w**:
 
-> **u** + **v** + **w** = [u1 + v1 + w1, u2 + v2 + w2, ..., un + vn + wn]
+> **u** + **v** + **w** = [u₁ + v₁ + w₁, u₂ + v₂ + w₂, ..., uₙ + vₙ + wₙ]
 
 You simply sum all the first components, then all the second components, and so on.
 
@@ -48,9 +48,7 @@ Geometrically, adding multiple vectors is like following a treasure map. You sta
 
 ---
 
-## Vector Multiplication
-
-### Scalar Multiplication: Scaling Influence
+## Scalar Multiplication: Scaling Influence
 
 A **scalar** is just a regular number (like 2, -0.5, or π). When you multiply a vector **v** by a scalar *c*, you change its magnitude (length) and potentially its direction (if *c* is negative).
 
@@ -62,11 +60,33 @@ A **scalar** is just a regular number (like 2, -0.5, or π). When you multiply a
 
 > **In ML terms:** This is how we apply **Weights**. If a model decides that "Square Footage" is twice as important as "Year Built," it will multiply the square footage vector by a scalar of 2.
 
-### The Dot Product: Measuring Similarity
+---
+
+## Vector Norms: Measuring Magnitude
+
+We said a vector has "magnitude," but how do we actually calculate it? The **norm** (or **magnitude** / **length**) of a vector tells us how "big" it is, regardless of direction.
+
+The most common norm is the **Euclidean norm** (also called the L2 norm). You square each component, sum them, and take the square root:
+
+> ||**v**|| = sqrt(v₁² + v₂² + ... + vₙ²)
+
+**Example:** If **v** = [3, 4]:
+
+> ||**v**|| = sqrt(3² + 4²) = sqrt(9 + 16) = sqrt(25) = 5
+
+A **unit vector** is any vector with a norm of 1. You can turn any vector into a unit vector by dividing it by its own norm — this is called **normalizing**:
+
+> **v̂** = **v** / ||**v**||
+
+> **In ML terms:** Normalization shows up everywhere. When we normalize feature vectors, we're stripping away "how much" and keeping only "in what direction." This prevents features with large raw values (like salary in the thousands) from dominating features with small values (like age in the tens).
+
+---
+
+## The Dot Product: Measuring Similarity
 
 While we can multiply a vector by a scalar, we also often "multiply" two vectors together using the **Dot Product** (**u** · **v**). This results in a single number (a scalar), not a new vector.
 
-> **u** · **v** = (u1 × v1) + (u2 × v2) + ... + (un × vn)
+> **u** · **v** = (u₁ × v₁) + (u₂ × v₂) + ... + (uₙ × vₙ)
 
 **Example:** Given the vectors **u** = [2, 3] and **v** = [4, 5]:
 
@@ -80,18 +100,39 @@ While we can multiply a vector by a scalar, we also often "multiply" two vectors
 
 > **In ML terms:** This is the core of **"Pattern Matching."** A model takes your input data, does a dot product with its learned weights, and the resulting number tells it how closely your data matches a specific pattern (like "this image is a cat").
 
+### Cosine Similarity: The "Fair" Comparison
+
+There's a catch with the raw dot product: it's affected by how *long* the vectors are, not just their direction. A vector [400, 100] will produce a huge dot product with almost anything, just because its values are large.
+
+**Cosine Similarity** fixes this by normalizing — it divides the dot product by both vectors' magnitudes:
+
+> cosine_similarity(**u**, **v**) = (**u** · **v**) / (||**u**|| × ||**v**||)
+
+The result is always between -1 and 1:
+
+- **1** means the vectors point in the exact same direction (perfect match).
+- **0** means they are perpendicular (completely unrelated).
+- **-1** means they point in opposite directions (anti-match).
+
+**Example:** **u** = [3, 4] and **v** = [4, 3]:
+
+> **u** · **v** = (3 × 4) + (4 × 3) = 12 + 12 = 24
+>
+> ||**u**|| = sqrt(9 + 16) = 5
+>
+> ||**v**|| = sqrt(16 + 9) = 5
+>
+> cosine_similarity = 24 / (5 × 5) = 24 / 25 = 0.96
+
+A score of 0.96 (very close to 1) tells us these two vectors are highly similar in *direction*, regardless of their scale.
+
+> **In ML terms:** Cosine similarity is the backbone of word embeddings (Word2Vec, GloVe), recommendation systems, and search engines. When you Google something and get "similar results," the system is often computing cosine similarity between your query vector and every document vector.
+
 ---
 
 ## Linear Combination
 
 A **Linear Combination** takes several vectors, scales them, and adds them together to create a new vector.
-
-| | |
-|---|---|
-| **Input** | Scalars and Vectors |
-| **Output** | A Vector |
-| **Formula** | **y** = c1 **v1** + c2 **v2** |
-| **Intuition** | "I am mixing 2 parts of Vitamin A and 3 parts of Vitamin B to create a new Supplement Vector." |
 
 ### Linear Combination Example
 
@@ -101,19 +142,19 @@ Let's ground this in a concrete numerical example. Imagine we are building a sim
 
 We have two vectors representing these features:
 
-- **v1** = [1, 0] — The "Sleep" dimension
-- **v2** = [0, 1] — The "Cycling" dimension
+- **v₁** = [1, 0] — The "Sleep" dimension
+- **v₂** = [0, 1] — The "Cycling" dimension
 
 Now, let's say a specific person slept 8 hours and cycled 30 km. In ML, the "weights" (scalars) are what the model learns. Let's assume the model decided:
 
-- c1 = 0.5 — Each hour of sleep adds 0.5 to the score
-- c2 = 0.2 — Each km cycled adds 0.2 to the score
+- c₁ = 0.5 — Each hour of sleep adds 0.5 to the score
+- c₂ = 0.2 — Each km cycled adds 0.2 to the score
 
 #### The Calculation
 
 We apply the Linear Combination formula:
 
-> **y** = c1(8 **v1**) + c2(30 **v2**)
+> **y** = c₁(8**v₁**) + c₂(30**v₂**)
 
 **Step 1: Scale the vectors (Scalar Multiplication)**
 
@@ -130,8 +171,8 @@ We apply the Linear Combination formula:
 
 Most data is messy. Imagine two different workouts that both affect "Endurance" and "Strength":
 
-- **Workout A** (**v1**): [2, 1] — High endurance, low strength
-- **Workout B** (**v2**): [1, 2] — Low endurance, high strength
+- **Workout A** (**v₁**): [2, 1] — High endurance, low strength
+- **Workout B** (**v₂**): [1, 2] — Low endurance, high strength
 
 If you do 2 of Workout A and 3 of Workout B:
 
@@ -153,7 +194,7 @@ A Linear Combination takes several vectors, scales them, and adds them together 
 |---|---|
 | **Input** | Scalars and Vectors |
 | **Output** | A Vector |
-| **Formula** | **y** = c1 **v1** + c2 **v2** |
+| **Formula** | **y** = c₁**v₁** + c₂**v₂** |
 | **Intuition** | "I am mixing 2 parts of Vitamin A and 3 parts of Vitamin B to create a new Supplement Vector." |
 
 ### 2. Dot Product (The "Comparison")
@@ -164,7 +205,7 @@ A Dot Product takes two vectors and multiplies their corresponding parts to see 
 |---|---|
 | **Input** | Two Vectors (of the same size) |
 | **Output** | A Scalar (a single number) |
-| **Formula** | **u** · **v** = u1 v1 + u2 v2 |
+| **Formula** | **u** · **v** = u₁v₁ + u₂v₂ |
 | **Intuition** | "How much does this person's health profile (Vector A) match the ideal athlete profile (Vector B)?" |
 
 ### 3. Where They Meet (The "Matrix-Vector" Secret)
@@ -190,11 +231,11 @@ The concept of **Span** is one of the most important ideas in Linear Algebra bec
 
 ### The Formal Definition
 
-The **Span** of a set of vectors {**v1**, **v2**, ..., **vn**} is the collection of **all possible linear combinations** of those vectors.
+The **Span** of a set of vectors {**v₁**, **v₂**, ..., **vₙ**} is the collection of **all possible linear combinations** of those vectors.
 
 Mathematically, it's every possible vector **y** you can create by changing the scalars:
 
-> **y** = a **v1** + b **v2** + c **v3** + ...
+> **y** = a**v₁** + b**v₂** + c**v₃** + ...
 
 ### Visualizing Span in 2D
 
@@ -222,6 +263,15 @@ Since centimeters are just inches multiplied by a scalar (2.54), these two vecto
 ### The "Basis"
 
 If a set of vectors is linearly independent and their span covers the entire space (like the 2D plane), we call that set a **Basis**. In ML, we want our features to be as close to a basis as possible — meaning they each provide unique, non-overlapping information.
+
+---
+
+## Common Mistakes and Gotchas
+
+- **Dot product ≠ element-wise multiplication.** The dot product gives you a single number (scalar). Element-wise multiplication gives you a new vector of the same size. They look similar but mean completely different things. In NumPy: `np.dot(u, v)` vs `u * v`.
+- **A high dot product doesn't always mean "similar."** A vector with huge values will produce a high dot product with almost anything. If you care about *direction* (similarity), use cosine similarity instead of the raw dot product.
+- **Different names ≠ independent features.** "Temperature in Celsius" and "Temperature in Fahrenheit" sound like two different features, but they're linearly dependent (one is a scaled-and-shifted version of the other). They add zero span to your model.
+- **Confusing scalars and vectors in a linear combination.** The scalars (c₁, c₂) are regular numbers; the vectors (**v₁**, **v₂**) are the arrays. The output is always a vector. If you accidentally dot-product instead of linear-combine, you'll get a scalar when you expected a vector.
 
 ---
 
@@ -263,7 +313,9 @@ Consider two vectors:
 
 The resulting vector has no length.
 
-**Part B:** The **Span** of these two vectors is restricted to a **single line** through the origin (the line y = x). It does **not** cover the entire 2D plane because **v** is just a scalar multiple of **u** (**v** = -1 · **u**), making them linearly dependent.
+**Part B:** Describe what the "Span" of these two vectors looks like.
+
+**Solution:** These two vectors are basically the same arrow pointing in opposite directions — **v** is just **u** flipped (**v** = -1 · **u**). No matter how you scale and add them, you can only ever slide back and forth along that one diagonal line (y = x). You'll never be able to step off it. So the span is just a single line through the origin, not the full 2D plane. This is what "linearly dependent" looks like in practice — the second vector gives you nothing new to work with.
 
 ---
 
@@ -290,5 +342,18 @@ Movie Y:
 
 **Movie X** has a higher dot product (22 > 15), meaning it aligns more closely with the user's interests. The system should recommend **Movie X**.
 
+**Follow-up to think about:** What if there were a Movie Z = [40, 10]? Its dot product would be (5 × 40) + (2 × 10) = 220 — vastly higher than Movie X's 22. But is it really 10x better of a match, or just 10x "louder"? This is exactly the problem with raw dot products — they're biased toward vectors with large magnitudes. A real recommendation system would use **cosine similarity** to compare direction only, stripping out the effect of scale.
+
 ---
 
+## Key Takeaways
+
+- **Vectors** are how ML represents data — each feature is a dimension.
+- **Vector addition** combines information; **scalar multiplication** controls how much each piece matters.
+- **The dot product** measures how similar two vectors are (pattern matching), but the raw value is influenced by magnitude — use **cosine similarity** when you only care about direction.
+- **Linear combinations** are the building blocks of every ML model: scale some vectors, add them up, get a new vector.
+- **Span** defines what your model can "reach." Redundant (linearly dependent) features waste dimensions without adding information. Aim for a **basis** — features that each contribute something unique.
+
+## What's Next
+
+In Lesson 1, we looked at individual arrows. In **Lesson 2**, we are going to start grouping those arrows into **Matrices** to see how we can move, stretch, or rotate entire sets of data at once. This is how a model actually "processes" an input.
