@@ -99,7 +99,7 @@ We don't use a Cost Function just to see how "bad" we are — we use it to **opt
 
 A **residual** is the vertical distance between a data point and the line — it's what MSE squares and averages. If the point is above the line, the residual is negative; if below, it's positive.
 
-!(linear_regression_speed_vs_power.png)
+![](linear_regression_speed_vs_power.png)
 
 The goal of Linear Regression is to position the line so that these vertical bars are as small as possible, collectively.
 
@@ -152,7 +152,7 @@ The "Life of a Model":
 5. **Update:** It nudges w and b in the direction that makes the cost smaller.
 6. **Repeat:** It does this until the line fits the data.
 
-![The Learning Curve](rapid_improvement.png)
+![The Learning Curve](images/rapid_improvement.png)
 
 ---
 
@@ -273,6 +273,8 @@ You are like a hiker trying to jump 5 miles at a time.
 
 - **The Result:** You might be at the top of the left side of the bowl, calculate the "downhill" direction, and jump so far that you land even **higher** on the right side.
 - **The Technical Term:** This is called **Divergence**. The model's error gets worse over time until the numbers "explode."
+
+![High Learning Rate Causing Oscillation in the 3D Bowl](images/learning_bowl.png)
 
 ### The "Goldilocks" Approach: Learning Rate Decay
 
