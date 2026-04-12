@@ -46,19 +46,19 @@ We introduce **Regularization** (specifically **L2 Regularization**, or "Ridge")
 ### Regularized Cost Function (Linear Regression + L2)
 
 ```
-           1    ᵐ                        λ    ⁿ
-J(w,b) = ---- * Σ  (ŷᵢ - yᵢ)²  +  ---- * Σ  wⱼ²
-           2m  ⁱ⁼¹                    2m  ʲ⁼¹
-           \_________________/      \______________/
-             The "Fit" Term          The "Penalty" Term
+                ᵐ                        ⁿ
+J(w,b) = 1/2m * Σ  (ŷᵢ - yᵢ)²  + λ/2m * Σ  wⱼ²
+                ⁱ⁼¹                      ʲ⁼¹
+         \__________________/    \______________/
+          The "Fit" Term         The "Penalty" Term
 ```
 
 Compare to the standard Cost Function without L2:
 
 ```
-           1    ᵐ
-J(w,b) = ---- * Σ  (ŷᵢ - yᵢ)²
-           2m  ⁱ⁼¹
+                ᵐ
+J(w,b) = 1/2m * Σ  (ŷᵢ - yᵢ)²
+                ⁱ⁼¹
 ```
 
 Let's break down this new, two-part equation:
@@ -208,10 +208,10 @@ Adding the L1 norm to your Cost Function is called **L1 Regularization** (or **L
 Because this is a tradeoff, modern graduate-level ML often uses **Elastic Net**. This is a cost function that includes **both** penalties:
 
 ```
-           1    ᵐ                   λ₁   ⁿ          λ₂    ⁿ
-J(w,b) = ---- * Σ  (ŷᵢ - yᵢ)²  + ---- * Σ |wⱼ|  + ---- * Σ  wⱼ²
-           2m  ⁱ⁼¹                  2m  ʲ⁼¹          2m  ʲ⁼¹
-                                    \___L1___/       \___L2___/
+                 ᵐ                       ⁿ                 ⁿ
+J(w,b) = 1/2m * Σ  (ŷᵢ - yᵢ)² + λ₁/2m * Σ |wⱼ| + λ₂/2m * Σ  wⱼ²
+                ⁱ⁼¹                      ʲ⁼¹               ʲ⁼¹
+                                  \____L1____/      \____L2____/
 ```
 
 This lets you get the feature-selection benefits of L1 while maintaining the mathematical stability and predictive power of L2.
@@ -223,17 +223,17 @@ This lets you get the feature-selection benefits of L1 while maintaining the mat
 When we add (λ/2m) Σwⱼ² to the cost function, the derivative (gradient) with respect to wⱼ changes. The new gradient becomes:
 
 ```
-∂J      1   ᵐ                     λ
---- = ---- * Σ  (ŷᵢ - yᵢ) * xᵢ + --- * wⱼ
-∂wⱼ     m  ⁱ⁼¹                    m
+              ᵐ
+∂J/∂wⱼ = 1/m * Σ  (ŷᵢ - yᵢ) * xᵢ + λ/m * wⱼ
+               ⁱ⁼¹
 ```
 
 The bias gradient is unchanged (we don't regularize the bias):
 
 ```
-∂J      1   ᵐ
---- = ---- * Σ  (ŷᵢ - yᵢ)
-∂b      m  ⁱ⁼¹
+             ᵐ
+∂J/∂b = 1/m * Σ  (ŷᵢ - yᵢ)
+              ⁱ⁼¹
 ```
 
 When you plug this into the update step:
@@ -247,11 +247,11 @@ wⱼ = wⱼ - α * ---
 If you rearrange the algebra:
 
 ```
-              λ                  1   ᵐ
-wⱼ = wⱼ(1 - α ---) - α * ---- * Σ  (ŷᵢ - yᵢ) * xᵢ
-              m                  m  ⁱ⁼¹
-     \___________/         \_________________________/
-      Weight Decay           Standard Gradient Step
+                                     ᵐ
+wⱼ = wⱼ * (1 - α * λ/m) - α * 1/m * Σ  (ŷᵢ - yᵢ) * xᵢ
+                                     ⁱ⁼¹
+     \__________________/   \____________________________/
+         Weight Decay           Standard Gradient Step
 ```
 
 This is the "Aha!" moment. The term **(1 - αλ/m)** is always slightly less than 1. This means in every single step of Gradient Descent, the weight is **first multiplied by a fraction to make it smaller** (Weight Decay), and **then** it moves in the direction of the gradient.
