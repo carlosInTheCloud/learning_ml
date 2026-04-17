@@ -1,5 +1,16 @@
 # Course 2 — Lesson 4.a — Neural Network Foundations & Forward Propagation
 
+After this lesson you should be able to:
+
+- Write the linear block as $\mathbf{z} = \mathbf{W}\mathbf{x} + \mathbf{b}$ and name **pre-activation** ($\mathbf{z}$) vs **activation** ($\mathbf{a} = g(\mathbf{z})$).
+- Explain why stacking **only** linear maps does not add depth, and why non-linear $g$ fixes that.
+- Write **forward propagation** for a small network (e.g. one hidden layer + output).
+- Describe **vectorization**: one matrix multiply applies the layer to many examples at once.
+
+**Notation:** superscripts like $^{[1]}$, $^{[2]}$ denote *layer index*; $\mathbf{x}$ is a column vector for a single example.
+
+---
+
 ## The first leap: from scalar to matrix
 
 In the lab, we had one output $\hat{y}$ and two features $(x_1, x_2)$. In a neural network, a single layer might have four neurons, all looking at those same two features.
@@ -66,13 +77,15 @@ $$
 g(z) = \max(0, z)
 $$
 
-ReLU is simple: if the input is negative, it outputs zero; if positive, it passes the value through. This creates the **sparsity** we discussed earlier and makes the math much faster for deep networks.
+ReLU is simple: if the input is negative, it outputs zero; if positive, it passes the value through. That **often produces many zeros** in $\mathbf{z}$ (useful sparsity in practice) and keeps the math fast for deep networks.
 
 ---
 
 ## The anatomy of a layer
 
-### First “deep” mental model
+The next subsections go from **mechanics** (what a layer is) to **intuition** (yarn, bike, composition) to **why depth helps** (XOR, basis, separation in higher dimensions).
+
+### Mechanics: what a “layer” is
 
 In standard deep learning terminology, a **layer** refers to the entire process of transforming an input into an activation.
 
@@ -84,11 +97,13 @@ input (x) → [layer 1] → [layer 2] → output (ŷ)
 
 Each layer is:
 
-1. **Linear step:** $\mathbf{z} = \mathbf{W}\mathbf{a}^{[\ell-1]} + \mathbf{b}$  
-   This is the raw score: a linear combination of the previous layer’s signals.
+1. **Linear step:** $\mathbf{z} = \mathbf{W}\mathbf{a}^{[\ell-1]} + \mathbf{b}^{[\ell]}$  
+   This is the raw score: a linear combination of the previous layer’s signals. (For $\ell = 1$, the input is $\mathbf{x}$ instead of $\mathbf{a}^{[0]}$.)
 
-2. **Activation step:** $\mathbf{a} = g(\mathbf{z})$  
-   This is the squished or rectified signal. The activation $\mathbf{a}$ is what is passed forward as the input to the next layer.
+2. **Activation step:** $\mathbf{a}^{[\ell]} = g(\mathbf{z})$  
+   This is the squished or rectified signal. The activation $\mathbf{a}^{[\ell]}$ is what is passed forward as the input to the next layer.
+
+<a id="why-activation-not-z"></a>
 
 ### Why $\mathbf{a}$ is the product, not $\mathbf{z}$?
 
@@ -103,13 +118,13 @@ In one layer, every neuron sees the same raw data, but each neuron is tuned to s
 
 To understand why this works, it helps to think in terms of **coordinate transformations**.
 
-### 1. The “manifold” intuition
+### Intuition (1): the “manifold” picture
 
 Imagine your “bonk” data as a messy pile of blue and red tangled yarn on a table. A single logistic regression (a straight line) is like a stiff ruler: no matter how you move it, you cannot perfectly separate the colors if they are tangled. A hidden layer acts like a **space warper**. When layer 1 applies $g(\mathbf{W}\mathbf{x} + \mathbf{b})$, it stretches, twists, and folds the coordinate system. It takes tangled data and **untangles** it into a new space where blue and red are easier to separate.
 
 By the time the data reaches the final layer, the yarn has been untangled enough that a simple straight line (logistic regression) can separate the classes.
 
-### 2. The hierarchy of abstraction
+### Intuition (2): hierarchy of abstraction
 
 Each layer performs **feature synthesis**: it turns granular data into more conceptual data.
 
@@ -121,22 +136,24 @@ Example (Trek Émonda–style scenario):
 
 Why does this help training? The second layer does not have to reason about messy raw power directly; it trains on **refined concepts** from the first layer. Predicting a bonk from “extreme fatigue” is easier than from “242 W” alone.
 
-### 3. The composition of functions
+### Intuition (3): composition of functions
 
-In calculus this is **function composition**: $f(g(h(x)))$. A neural network is a large **universal function approximator**. The **universal approximation theorem** says that with at least one hidden layer, enough neurons, and a non-linear activation (sigmoid or ReLU), you can approximate a wide class of functions.
+In calculus this is **function composition**: $f(g(h(x)))$. A neural network is often described as a **universal function approximator**. The classical **universal approximation theorem** (one common form) concerns **shallow** networks: roughly, a single hidden layer with **enough neurons** and a suitable non-linearity (e.g. sigmoid-like) can approximate many continuous functions on a bounded domain. In practice, **deep** networks are motivated by **composition** and hierarchical features—not only by that shallow theorem.
 
-Stacking layers builds a kind of **logic circuit**:
+Stacking layers also suggests a **logic circuit** picture:
 
 - Layer 1: “Is this true?”
 - Layer 2: “If [layer 1, neuron A] is true and [layer 1, neuron B] is false, then …”
 
 The activation from layer 1 “works” for layer 2 because layer 1 has already extracted signal from noise—it passes a **summary** forward.
 
-### Why does it work? Linear separability and basis change
+### Why depth helps: linear separability and basis change
 
-#### The problem: the XOR proof
+#### The problem: XOR and linear classifiers
 
-A classic illustration is **XOR**: two inputs $(x_1, x_2)$; output 1 when exactly one input is active, 0 when both are on or both are off. Plotted in 2D, **no single straight line** (logistic regression) can separate the classes. A single layer implements a **linear decision boundary**; if the data are not linearly separable, one layer cannot solve XOR.
+A classic illustration is **XOR**: two inputs $(x_1, x_2)$; output 1 when exactly one input is active, 0 when both are on or both are off. Plotted in 2D, **no single straight line** can separate the two classes. A **linear classifier** (logistic regression with no hidden layer) draws one linear decision boundary, so it **cannot** represent XOR.
+
+That does **not** mean neural networks fail on XOR: a network with **a hidden layer** and a non-linear activation **can** solve XOR by re-embedding the points. The limitation applies to **one linear map from inputs to output**, not to “any network.”
 
 #### The solution: changing the basis
 
@@ -150,9 +167,9 @@ $$
 
 This **projects** the data (often into a higher-dimensional space) and then **clips** it with the activation. By the time data reaches the second layer, the **coordinates have changed**: the first layer has built new dimensions that are non-linear combinations of the originals.
 
-**Cover’s theorem** (informally): complex patterns mapped into a high-dimensional space are **more likely** to become linearly separable than in a low-dimensional space.
+**Cover’s theorem** is often cited as **motivation** (not a guarantee for every dataset): mapping data into a **high-dimensional** space can make complex patterns **easier to separate linearly** than in the original low-dimensional space. Treat it as a useful rule of thumb alongside kernels and hidden layers.
 
-#### The “universal approximation” angle
+#### Piecewise shapes and depth
 
 Why does layer 1’s output “work” for layer 2? Because of **composition**. If $f$ is linear, then $f(f(x))$ is still linear. But with a non-linearity $\sigma$, the map $f(\sigma(x))$ becomes **piecewise** linear (or more expressive). Each neuron in layer 1 adds a **hinge** (ReLU) or **curve** (sigmoid) to the landscape; layer 2 **sums** those pieces to build richer shapes.
 
@@ -160,7 +177,7 @@ Why does layer 1’s output “work” for layer 2? Because of **composition**. 
 - **Layer 2:** Combines those primitives into bumps and valleys.
 - **Layer 3+:** Combines those into arbitrarily complex decision boundaries.
 
-**Summary:** One layer only solves problems that are linearly separable; much real data is not. Non-linear activations map data into new coordinates where features are **higher-level combinations** of inputs. Stacking such maps lets us approximate complex functions from simpler, piecewise parts.
+**Summary:** A **single linear classifier** only solves problems that are linearly separable; much real data is not. Non-linear activations map data into new coordinates where features are **higher-level combinations** of inputs. Stacking such maps lets us approximate complex functions from simpler, piecewise parts.
 
 ---
 
@@ -192,7 +209,9 @@ $$
 \mathbf{Z}^{[2]} = \mathbf{W}^{[2]}\mathbf{A}^{[1]} + \mathbf{b}^{[2]}
 $$
 
-For binary classification, apply **sigmoid** at the output:
+For **binary** classification with a **single** logit, $\mathbf{Z}^{[2]}$ is a scalar (or a 1×1 object); $\hat{y}$ is a scalar probability in $(0, 1)$. If you have multiple output units, $\mathbf{Z}^{[2]}$ and $\hat{y}$ are vectors—same formulas, with shapes carried through consistently.
+
+Finally, apply **sigmoid** at the output:
 
 $$
 \hat{y} = \mathbf{A}^{[2]} = \sigma(\mathbf{Z}^{[2]})
@@ -204,23 +223,36 @@ $$
 
 In earlier labs we used `np.dot(X, w)`. Neural networks do the same, but for **every example at once**.
 
+**Layout in this note:** stack **examples as columns**. If you have $m$ rides, each column of $\mathbf{X}$ is one ride: **rows = features**, **columns = examples**. So a single example stays a column vector $\mathbf{x}$ as above; the batch matrix $\mathbf{X}$ has the same row count as $\mathbf{x}$ and $m$ columns.
+
 For a hidden layer with 2 inputs and 5 neurons:
 
 1. $\mathbf{W}^{[1]}$ has shape **5 × 2** (five neurons, each with two weights).
-2. The activation $\mathbf{a}^{[1]}$ has **five** values passed to the next layer.
+2. The activation $\mathbf{A}^{[1]}$ has **five** rows and **one column per example** when vectorized.
 
 If you have $m = 1000$ rides and two features (e.g. power $x_1$ and cadence $x_2$):
 
-- $\mathbf{X}$ can be **2 × 1000** (features × examples).
+- $\mathbf{X}$ is **2 × 1000** (features × examples).
 - $\mathbf{W}^{[1]}$ remains **5 × 2**.
-- $\mathbf{Z}^{[1]}$ becomes **5 × 1000**.
+- $\mathbf{Z}^{[1]} = \mathbf{W}^{[1]}\mathbf{X} + \mathbf{b}^{[1]}$ is **5 × 1000**: the bias **broadcasts** across columns—each ride adds the same $\mathbf{b}^{[1]}$ to its pre-activations.
 
 One matrix multiply updates all 1000 examples at once. That is why large datasets and deep models are practical—**GPUs** are built for these operations.
 
 ---
 
-## The non-linearity requirement
+## The non-linearity requirement (recap)
 
-What if we removed activations $g(\mathbf{z})$ and passed $\mathbf{Z}$ through unchanged?
+This is the same core fact as in [Why $\mathbf{a}$ is the product, not $\mathbf{z}$?](#why-activation-not-z): if you removed activations $g(\mathbf{z})$ and fed $\mathbf{Z}$ forward unchanged, composing affine maps would still be **one** affine map. A 100-layer network would not gain expressive power over a single linear regression for what it can represent as a **pure composition of linear steps**.
 
-The network **collapses**: a linear function of a linear function is still linear. Without ReLU or sigmoid, a 100-layer “deep” network would have no more expressive power than a single linear regression for representation purposes. Activations are what let the network learn **bends** and **curves** in the data.
+Activations are what let the network learn **bends** and **curves** in the data. Hidden layers typically use **ReLU**; **sigmoid** (or softmax, not covered here) often appears at the output for probabilities.
+
+---
+
+## Key takeaways
+
+- **Pre-activation** $\mathbf{z} = \mathbf{W}\mathbf{a} + \mathbf{b}$; **activation** $\mathbf{a} = g(\mathbf{z})$—that is what the next layer consumes.
+- **Matrices** pack many neurons; each **row** of $\mathbf{W}$ is one neuron’s weights.
+- **ReLU** is standard in hidden layers; **sigmoid** at the output is common for binary probabilities.
+- **Forward propagation** chains linear blocks and activations: $\mathbf{x} \to \mathbf{Z}^{[1]} \to \mathbf{A}^{[1]} \to \mathbf{Z}^{[2]} \to \hat{y}$.
+- **Vectorization:** $\mathbf{X}$ has shape (features, $m$); $\mathbf{b}$ broadcasts over columns; one multiply does all $m$ examples.
+- **Depth** matters because non-linearities break linear composition; **stacking** layers builds piecewise, hierarchical decision boundaries and features.
