@@ -7,7 +7,7 @@ Notes, math, and code labs for **machine learning**—organized from **foundatio
 Material is grouped into **courses** (`course_1`, `course_2`, …). Each course is split into **modules** or **lessons** that are meant to be read **in order**: each unit assumes you are comfortable with the concepts and notation from the earlier ones. Lessons are **stepping stones**—later labs and derivations build directly on earlier definitions (e.g. vectors and matrices before determinants; derivatives before the chain rule and partial derivatives; linear regression before logistic regression; logistic regression and calculus before overfitting and neural nets).
 
 - **Course 1** establishes the **math language** used everywhere later (vectors, matrices, slopes, gradients).
-- **Course 2** applies that language to **models**: fit lines and surfaces, classify with logits, control complexity with regularization, then stack layers into a small network.
+- **Course 2** applies that language to **models**: fit lines and surfaces, classify with logits, control complexity with regularization, stack layers into a small network, then introduce **decision trees** (entropy, information gain) and **ensembles** (bagging / boosting).
 
 Supporting files at the repo root (`requirements.txt`, `setup.sh`) keep the Python environment consistent for labs.
 
@@ -87,5 +87,17 @@ Path: `course_2/lesson_4/`
 | [Lab — train a 2-layer network (NumPy)](course_2/lesson_4/lesson_4_lab.md) |
 | [Review — questions](course_2/lesson_4/lesson_4_review.md) |
 | [Review — answers](course_2/lesson_4/lesson_4_review_answers.md) |
+
+#### Lesson 5 — Decision trees (entropy, information gain, ensembles)
+
+Path: `course_2/lesson_5/`
+
+| Topic |
+|-------|
+| [Decision trees: entropy, information gain, CART, pruning & ensembles](course_2/lesson_5/lesson_5.md) |
+| [Lab — decision tree from scratch (NumPy)](course_2/lesson_5/lesson_5_lab.md) |
+| [Lab — reference implementation (Python)](course_2/lesson_5/lesson_5_lab_answer.py) |
+| [Review — questions](course_2/lesson_5/lesson_5_review.md) |
+| [Review — answers](course_2/lesson_5/lesson_5_review_answers.md) |
 
 **Assets:** figures for Course 2 live in `course_2/images/`.
