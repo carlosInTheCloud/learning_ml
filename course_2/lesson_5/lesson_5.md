@@ -1,5 +1,49 @@
 # Course 2 — Lesson 5, Part 1 — Entropy & information gain
 
+## Introduction to the Rule Family: Decision Trees & Ensembles
+
+Now that you have mastered the Equation Family (Linear Regression, Logistic Regression, and Neural Networks), we are going to shift gears and explore the Rule Family: Decision Trees, Random Forests, and XGBoost.
+
+While these two families "think" differently—equations draw smooth, continuous curves using calculus, while trees draw rigid, step-by-step boxes using discrete logic—they both belong to the exact same toolbox: Supervised Machine Learning.
+
+Here is a high-level overview of how these tree-based algorithms actually work.
+
+### The Two-Phase Engine
+
+In supervised learning, it can feel counterintuitive to feed an algorithm the "answers" to a problem. But we don't build these trees to predict the past; we use the past to write a rulebook for the future. This happens in two distinct phases:
+
+#### Phase 1: Training (Building the Rulebook)
+
+During training, we give the algorithm historical data where we already know the outcome.
+
+- **The Features ($X$):** The historical clues (e.g., Power and Cadence data from past rides).
+- **The Ground Truth ($y$):** The actual, known outcome (e.g., Bonk or No Bonk).
+
+The algorithm's job is not to guess $y$, but to use it as an answer key. It plays a massive, mathematical game of "20 Questions." It tests every possible threshold to find the exact rules—like "Is Power $\ge 230\text{W}$?"—that best separate the data into pure buckets. Once it finishes building this flowchart, Phase 1 is done, and the historical $y$ answers are discarded.
+
+#### Phase 2: Inference (Predicting the Unknown)
+
+This is where the tree is deployed to generate actual value.
+
+- **New Data (New $X$):** We feed the tree brand new data for an upcoming event (e.g., planning a new ride at $240\text{W}$).
+- **The Prediction ($\hat{y}$):** Because this event hasn't happened yet, there is no $y$. Instead, the new data drops into the top of the flowchart built in Phase 1. It follows the logic gates down the branches until it hits a final bucket (a **Leaf Node**), which outputs the official prediction.
+
+By operating this way, Decision Trees give us a highly interpretable, "white box" model. We can trace exactly why the algorithm made a specific prediction, setting the perfect foundation before we scale them up into massive Ensembles like Random Forests.
+
+## Zooming In: The Anatomy of a Decision Tree
+
+Before we can combine hundreds of models into a massive ensemble like a Random Forest, we need to understand how to grow just one. At its core, a single Decision Tree is simply a machine-generated flowchart.
+
+Unlike a human expert who might weigh dozens of pros and cons simultaneously to make a decision, a Decision Tree is strictly binary and sequential. It looks at the dataset and asks a single yes/no question to split the data into two smaller buckets.
+
+It then moves into those new buckets and asks another question, repeating this process recursively until it reaches a definitive conclusion (a final **Leaf Node**).
+
+But how does the computer know which question to ask first? It doesn't use intuition; it uses pure mathematical brute force. It calculates the **entropy** (the amount of chaos or uncertainty) in the current dataset, and tests every possible split to find the one that yields the highest **information gain** (the most chaos destroyed).
+
+By ruthlessly picking the best mathematical split at every single step—a process known as a **greedy algorithm**—the tree automatically writes the optimal, most efficient rulebook for your data.
+
+---
+
 To build a **decision tree**, the computer must decide **which question to ask first** at the top of the flowchart.
 
 Imagine you want to predict whether a ride ends in a **“Bonk.”** You have two candidate splits:
