@@ -44,6 +44,34 @@ By ruthlessly picking the best mathematical split at every single step—a proce
 
 ---
 
+### The Mental Model: The Sorting Funnel
+
+To visualize how this actually works without getting bogged down in the math, imagine a massive funnel with a series of trapdoors inside it.
+
+#### Part 1: Building the Funnel (Training)
+
+Imagine taking the data from 100 of your past interval sessions—some where you successfully completed the workout, and some where you completely bonked. You dump all 100 records into the top of the funnel.
+
+The algorithm looks at that messy pile of data and searches for the single best way to divide it. It realizes that almost every time your target power was above 230 Watts, you bonked. So, it installs a trapdoor at the top of the funnel: "Was Power $\ge 230\,\text{W}$?" The data falls through the funnel and splits into two smaller, slightly cleaner piles. The algorithm then looks at the "Power $< 230\,\text{W}$" pile and realizes it needs another split. It installs a second trapdoor: "Was Cadence $< 80\,\text{RPM}$?" It continues installing trapdoors until every single ride at the bottom of the funnel is perfectly sorted into pure buckets of "Bonked" or "Completed." The funnel is now built.
+
+#### Part 2: Dropping the Ball (Predicting)
+
+Now, you plan a brand new 4x8 minute VO2 max workout for tomorrow. You expect to hold 240 Watts at 90 RPM.
+
+You take this single, new workout—like dropping a marble into a maze—and toss it into the top of the funnel.
+
+It hits the first trapdoor ("Is Power $\ge 230\,\text{W}$?"). Because your planned power is 240, the trapdoor swings open to the right.
+
+The marble bypasses the Cadence trapdoor entirely and falls straight into a final bucket at the bottom.
+
+You look at the label on that bucket. It says "Bonk."
+
+The algorithm didn't predict the future by running a complex calculus equation; it simply sorted your new workout through the physical logic gates it built from your past experiences.
+
+---
+
+### How we build the tree
+
 To build a **decision tree**, the computer must decide **which question to ask first** at the top of the flowchart.
 
 Imagine you want to predict whether a ride ends in a **“Bonk.”** You have two candidate splits:
@@ -57,7 +85,7 @@ To quantify chaos, machine learning borrows **entropy** from information theory 
 
 ---
 
-## 1. Shannon entropy ($H$)
+### 1. Shannon entropy ($H$)
 
 Claude Shannon introduced this in 1948. **Entropy** measures **impurity**, **uncertainty**, or **surprise** in a set of labels.
 
@@ -66,7 +94,7 @@ Claude Shannon introduced this in 1948. **Entropy** measures **impurity**, **unc
 
 ---
 
-## 2. The formula (binary labels)
+### 2. The formula (binary labels)
 
 For a finite set $S$ with **binary** outcomes (positive / negative), **Shannon entropy** (base 2) is:
 
@@ -86,20 +114,20 @@ where:
 
 ---
 
-## 3. A concrete example (Lab 4–style data)
+### 3. A concrete example (Lab 4–style data)
 
 Use the same tiny setup as in **Lesson 4**’s lab: **$m = 4$** rides.
 
 - **1** ride: Bonk (positive)
 - **3** rides: No Bonk (negative)
 
-### Step A — Probabilities
+#### Step A — Probabilities
 
 $$
 p_{+} = \frac{1}{4} = 0.25, \qquad p_{-} = \frac{3}{4} = 0.75
 $$
 
-### Step B — Plug into the formula
+#### Step B — Plug into the formula
 
 $$
 H = -(0.25 \times \log_2(0.25)) - (0.75 \times \log_2(0.75))
@@ -116,7 +144,7 @@ $$
 H = -(0.25 \times -2) - (0.75 \times -0.415) = 0.5 + 0.311 \approx \mathbf{0.811}
 $$
 
-### Interpretation
+#### Interpretation
 
 The entropy of this starting set is about **$0.811$** bits. That is **fairly high** (near the maximum of **$1$** for a binary split), so the set is **impure** and **uncertain**: the labels are mixed.
 
@@ -126,7 +154,7 @@ The **drop** in entropy from the parent set to the children after a split is qua
 
 ---
 
-## Part 1B — Information gain (IG)
+### Part 1B — Information gain (IG)
 
 If **entropy** measures **chaos**, **information gain** measures **how much chaos we remove** by asking a **specific** question (a candidate split).
 
@@ -137,7 +165,7 @@ A decision tree algorithm is like a long game of **“20 questions.”** It trie
 
 For **each** candidate split, it computes **information gain**. The split with the **highest** gain (largest reduction in weighted chaos) is a strong choice for the next **node** in the tree.
 
-### The information gain formula
+#### The information gain formula
 
 Compare entropy **before** the split (the **parent** node) to the **weighted average** entropy **after** the split (the **child** buckets):
 
@@ -156,7 +184,7 @@ The **weights** $m_{\text{left}}/m$ and $m_{\text{right}}/m$ matter: we care abo
 
 ---
 
-## Part 1C — Worked example: “Was Power High?”
+### Part 1C — Worked example: “Was Power High?”
 
 Our **parent** dataset is perfectly split: **3 Bonks** and **3 No Bonks**. Because it is a 50/50 coin toss, the starting chaos is at its **absolute maximum**:
 
@@ -175,7 +203,7 @@ We want to test whether asking **“Was Power High?”** is a good split. Here i
 | 5 | Low | No |
 | 6 | Low | No |
 
-### Step 1 — Execute the split
+#### Step 1 — Execute the split
 
 Imagine physically sorting these **6** rides into two buckets based on **“Is Power High?”**
 
@@ -183,7 +211,7 @@ Imagine physically sorting these **6** rides into two buckets based on **“Is P
 
 **Right bucket (No — Low power):** rides **5, 6** → **2** rides total: **0 Bonks**, **2 No Bonks**.
 
-### Step 2 — Entropy of the children
+#### Step 2 — Entropy of the children
 
 **1. Left bucket — $H(\text{Left})$**
 
@@ -213,7 +241,7 @@ $$
 H(\text{Right}) = \mathbf{0.0}
 $$
 
-### Step 3 — Weighted average entropy
+#### Step 3 — Weighted average entropy
 
 We cannot simply add **$0.811$** and **$0.0$**. The left bucket has twice as many rides as the right, so its chaos counts more. Weight by size relative to the parent (**$m = 6$**):
 
@@ -227,7 +255,7 @@ $$
 
 This is the **total chaos remaining** after splitting on Power.
 
-### Step 4 — Information gain (IG)
+#### Step 4 — Information gain (IG)
 
 Subtract remaining chaos from starting chaos:
 
@@ -239,7 +267,7 @@ $$
 \text{IG} = 1.0 - 0.541 = \mathbf{0.459}
 $$
 
-### Conclusion
+#### Conclusion
 
 By asking **“Was Power High?”**, we remove about **$0.459$ bits** of chaos.
 
@@ -247,11 +275,11 @@ In code, the algorithm repeats this calculation for **every other feature** (e.g
 
 ---
 
-## Part 2 — Two families: ID3 / C4.5 vs CART
+### Part 2 — Two families: ID3 / C4.5 vs CART
 
 Historically, there are two major **families** of decision-tree algorithms (often introduced in a syllabus as **ID3** and **CART**). Here is how they treat a feature like power when it has **High**, **Medium**, and **Low** categories.
 
-### 1. Multi-way splits (ID3 / C4.5)
+#### 1. Multi-way splits (ID3 / C4.5)
 
 Algorithms in the **ID3** family (including extensions such as **C4.5**) allow a node to split into **as many child buckets as there are categories**.
 
@@ -261,7 +289,7 @@ If power takes values High, Medium, and Low, the tree grows **three branches at 
 
 **Drawback:** Multi-way splits tend to **shatter** the data quickly. A categorical field with many levels (e.g. **20 cities**) creates **20 small buckets** in one step, which often drives **severe overfitting**.
 
-### 2. Strictly binary splits (CART)
+#### 2. Strictly binary splits (CART)
 
 **CART** stands for **Classification and Regression Trees**. It is the usual choice in modern practice and is what libraries such as **scikit-learn** use for their standard tree learners.
 
@@ -284,7 +312,7 @@ Deeper in the tree, on that right branch, a later split might ask **“Is power 
 
 ---
 
-## Part 3 — Overfitting and pruning
+### Part 3 — Overfitting and pruning
 
 If you run a **standard CART** learner on your cycling data with **no extra constraints**, it will keep splitting until **every leaf** has label entropy **exactly $0.0$**—pure buckets only.
 
@@ -292,7 +320,7 @@ That can produce absurdly specific rules, along the lines of: “Was cadence > 8
 
 This is classic **high variance** (**overfitting**). The main remedy is **pruning**—limiting complexity either **while** the tree grows or **after** it has grown.
 
-### 1. Pre-pruning (early stopping)
+#### 1. Pre-pruning (early stopping)
 
 This is the approach you see most often in practice: **hyperparameters** cap growth **before** the tree becomes a dictionary of the training rows.
 
@@ -300,13 +328,13 @@ This is the approach you see most often in practice: **hyperparameters** cap gro
 - **Minimum samples per split:** e.g. “Do not split a node that holds **fewer than 10** rides.” That blocks hyper-specific rules for **tiny** groups and outliers.
 - **Minimum information gain:** e.g. “If the best candidate split has **IG < 0.05**, do **not** split.” That suppresses **weak** questions that barely reduce chaos.
 
-### 2. Post-pruning (grow, then cut)
+#### 2. Post-pruning (grow, then cut)
 
 Here the tree is allowed to grow **large** (often fully fitting the training noise). Then, using a **validation** set (or a cost–complexity criterion), you walk **from the leaves upward** and ask whether each **branch** actually **helps** out-of-sample performance. If removing a subtree **does not hurt** (or **helps**) validation quality, you **remove** it. You repeat until further cuts would **clearly** worsen the model.
 
 Think of it as trimming the tree **after** seeing how much each twig contributes on **fresh** data.
 
-### Connection to Lessons 3 and 4
+#### Connection to Lessons 3 and 4
 
 **Forcing a simpler model** should sound familiar. In **Lessons 3 and 4**, **$L2$ regularization** (the **$\lambda$** penalty on large weights) **constrains** a neural network so it cannot chase every quirk of the training set.
 
@@ -314,7 +342,7 @@ Think of it as trimming the tree **after** seeing how much each twig contributes
 
 ---
 
-## Part 4 — Ensembles: bagging and boosting
+### Part 4 — Ensembles: bagging and boosting
 
 This is where much of **modern applied** machine learning lives. In a **Kaggle**-style competition, or when shipping a **tabular** predictive model inside a product, you will very often use an **ensemble**.
 
@@ -322,7 +350,7 @@ An ensemble uses **wisdom of the crowd**: instead of one **deep, unstable** deci
 
 There are two dominant coordination patterns: **bagging** and **boosting**.
 
-### 1. Bagging (bootstrap aggregating)
+#### 1. Bagging (bootstrap aggregating)
 
 **Bagging** stresses **parallel** models whose errors are **averaged out**—primarily attacking **variance** (**overfitting**). The flagship example is the **random forest**.
 
@@ -341,7 +369,7 @@ Picture debugging a **phantom shifting** problem on a drivetrain. One expert sta
 
 Many **moderately simple** trees cast a **majority vote** (for classification) or an **average** (for regression). **Idiosyncratic** errors tend to **cancel**; you get strong **variance reduction** without hand-tuning a single giant tree’s prune settings.
 
-### 2. Boosting
+#### 2. Boosting
 
 **Boosting** stresses **sequential** correction—each new model targets what the **previous** ones got wrong. That pushes **accuracy** hard and mainly fights **underfitting** and **residual error** (**bias** in a loose sense). Well-known methods include **AdaBoost** and **gradient boosting** (a family that includes the widely used **XGBoost** implementation).
 
@@ -361,7 +389,7 @@ It resembles **periodized training**: a baseline test shows **VO₂ max** is the
 
 You get a **chain** of small corrections. **Gradient boosting** and its optimized implementations are often the **strongest default** for **structured / tabular** data—while **watching** validation performance, because a **very long** chain can still **overfit**.
 
-### Summary comparison
+#### Summary comparison
 
 | | **Bagging (e.g. random forest)** | **Boosting (e.g. gradient boosting / XGBoost)** |
 | --- | --- | --- |
@@ -373,17 +401,17 @@ These are the **conceptual skeleton** of the tree-based methods that underpin a 
 
 ---
 
-## Part 5 — Brute force at each node: who asks the questions?
+### Part 5 — Brute force at each node: who asks the questions?
 
 The secret is that the algorithm has **no intuition**. It does not “think up” good questions. It uses **exhaustive search** over mechanically generated candidates—**brute force** guided by the **information gain** score.
 
 Here is **who** proposes the splits and **how** they are built.
 
-### 1. Who formulates the questions?
+#### 1. Who formulates the questions?
 
 **No human** hand-writes the rules. A learner such as **CART** **generates** candidate questions from the **values actually present** in each column: thresholds for numbers, equality tests for categories, and so on.
 
-### 2. How does it formulate them?
+#### 2. How does it formulate them?
 
 The recipe depends on whether the feature is **categorical** (labels) or **continuous** (real numbers).
 
@@ -409,7 +437,7 @@ So you get:
 
 If a column has **10,000** **distinct** numeric values, there are **9,999** adjacent gaps—hence **9,999** threshold tests of that form (implementations often **prune** redundant or duplicate candidates for speed, but the **idea** is this exhaustive grid).
 
-### 3. The master loop (building one node)
+#### 3. The master loop (building one node)
 
 After generating **all** candidate questions for **every** column (within the rules of the implementation), the algorithm runs the same **evaluation loop** at **each** node:
 
@@ -419,6 +447,6 @@ After generating **all** candidate questions for **every** column (within the ru
 
 You can picture an inner monologue at the root: *“Test cadence == High—record IG. Test power > 195—higher IG? replace best-so-far. Test power > 207.5…”* After every candidate is scored, the **winner** is installed; then the same **brute-force** search runs **inside** each new child.
 
-### Takeaway
+#### Takeaway
 
 Tree induction at each depth is typically **greedy**: it does **not** plan several moves ahead. It only maximizes **immediate** impurity reduction (or gain), then moves down and repeats. That locality is simple and fast—but it is why **depth limits**, **pruning**, and **ensembles** matter for **generalization**.
