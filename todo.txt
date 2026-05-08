@@ -1,0 +1,8 @@
+lesson 1:
+    * continuity
+    * differentiation
+    * integration
+    * optimization (finding extrema)
+    * parametized curves
+    * multivariable calculus
+        * Lagrangian multipliers
