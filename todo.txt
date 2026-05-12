@@ -1,3 +1,4 @@
+
 lesson 1:
     * continuity
     * differentiation
@@ -6,3 +7,5 @@ lesson 1:
     * parametized curves
     * multivariable calculus
         * Lagrangian multipliers
+    
+lesson 6 sidebar: Euclidean norm.
