@@ -21,7 +21,9 @@ print("Training data setup complete")
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score
 
-primal_svm = LinearSVC(loss='hinge', dual=False, C=1.0)
+# Primal formulation (dual=False). liblinear does not allow loss="hinge" here;
+# squared_hinge is the supported L2 loss for the primal; still trains a linear separator.
+primal_svm = LinearSVC(loss="squared_hinge", dual=False, C=1.0)
 primal_svm.fit(X_train, y_train)
 
 print(f"Task 1: Primal SVM accuracy: {accuracy_score(y_test, primal_svm.predict(X_test))}")
