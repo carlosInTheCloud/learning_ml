@@ -7,7 +7,7 @@ Notes, math, and code labs for **machine learning**—organized from **foundatio
 Material is grouped into **courses** (`course_1`, `course_2`, …). Each course is split into **modules** or **lessons** that are meant to be read **in order**: each unit assumes you are comfortable with the concepts and notation from the earlier ones. Lessons are **stepping stones**—later labs and derivations build directly on earlier definitions (e.g. vectors and matrices before determinants; derivatives before the chain rule and partial derivatives; linear regression before logistic regression; logistic regression and calculus before overfitting and neural nets).
 
 - **Course 1** establishes the **math language** used everywhere later (vectors, matrices, slopes, gradients).
-- **Course 2** applies that language to **models**: fit lines and surfaces, classify with logits, control complexity with regularization, stack layers into a small network, then introduce **decision trees** (entropy, information gain) and **ensembles** (bagging / boosting), and finally **support vector machines** (maximum margin, primal vs dual, the kernel trick) with a **scikit-learn** companion note.
+- **Course 2** applies that language to **models**: fit lines and surfaces, classify with logits, control complexity with regularization, stack layers into a small network, then introduce **decision trees** (entropy, information gain) and **ensembles** (bagging / boosting), and finally **support vector machines** (maximum margin, primal vs dual, soft margins and **$C$** / **cross-validated tuning**, the kernel trick, big-data **kernel approximation**) with a **scikit-learn** companion note, a **hands-on lab**, and an **assessment**.
 
 Supporting files at the repo root (`requirements.txt`, `setup.sh`) keep the Python environment consistent for labs.
 
@@ -108,6 +108,9 @@ Path: `course_2/lesson_6/`
 |-------|
 | [Support Vector Machines & the kernel trick](course_2/lesson_6/lesson_6a.md) |
 | [SVMs in scikit-learn (three scenarios)](course_2/lesson_6/lesson_6b.md) |
+| [Lab — primal vs dual, RBF kernel, soft margin & support vectors](course_2/lesson_6/lesson_6_lab.md) |
+| [Lab — reference implementation (Python)](course_2/lesson_6/lesson_6_lab_answers.py) |
+| [Lab — training data generator (writes `lesson_6_lab_data.csv`)](course_2/lesson_6/lesson_6_lab_training_data.py) |
 | [Assessment — questions](course_2/lesson_6/assessment.md) |
 | [Assessment — answers](course_2/lesson_6/assessment_answers.md) |
 

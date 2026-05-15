@@ -11,7 +11,8 @@ This lesson is structured as a build-up:
 5. **Inside the dual** — the Lagrangian derivation and where sparsity comes from.
 6. **The kernel trick** — where SVMs stop being "only geometry" and become a famously efficient way to capture **nonlinear** boundaries.
 7. **Production view** — how the math collapses into a tiny, fast serialized model at inference.
-8. **Big data vs nonlinear boundaries** — where both paths fail individually, why industry often pivots outside the equation family — and **kernel approximation** (`RBFSampler` + `LinearSVC`) when you still need margins in bulk.
+8. **Fine-tuning $C$** — why fixed violator quotas fail, **Bayes-risk–like** ambiguity differs by dataset, **log-spaced** search and cross-validation (e.g. `GridSearchCV`), and using violator / SV counts as **diagnostics** after picking a model.
+9. **Big data vs nonlinear boundaries** — where both paths fail individually, why industry often pivots outside the equation family — and **kernel approximation** (`RBFSampler` + `LinearSVC`) when you still need margins in bulk.
 
 ---
 
@@ -483,7 +484,7 @@ With **$b = 0$** (consistent with a symmetric hard-margin placement between $x=-
 
 ---
 
-## Part 8: The Architect's view — inference and serialization
+## Part 8: Inference and serialization
 
 How does this heavy training math translate into a fast production system? It comes back to the **sparsity** that hinge loss and the dual path created.
 
@@ -512,7 +513,87 @@ This is the elegance hidden inside the math: hinge loss said *"ignore the safe p
 
 ---
 
-## Part 9: The scale wall, kernel approximation, and nonlinear boundaries at enormous $n$
+## Part 9: Fine-tuning $C$ — noise, logarithmic search, and `GridSearchCV`
+
+So far, $C$ has been a **knob** on the soft margin: how hard to penalize slack. In practice, there is no universal “right” $C$ — it must be **chosen for the dataset**. This part sharpens the mental model, then names the standard industrial search pattern.
+
+### The mental model — why “tune $C$ until 5% are violators” fails
+
+Every dataset carries a baseline of **fundamentally unfixable ambiguity** — overlap between classes driven by labeling noise, measurement error, omitted variables, and so on. In statistics this floor is tied to notions like the **Bayes risk** / ideal error rate achievable by any predictor with knowledge of the true data-generating process. Real data never admits a separator that respects both physics and sensors **and** achieves zero training error everywhere.
+
+Contrast two cycling worlds:
+
+**Dataset A (clean).** Elite track endurance: controlled conditions; **Bonk vs No Bonk** is almost separable. Inherent ambiguity might sit near **0.1%**.
+
+**Dataset B (messy).** Mountain biking in bad weather **plus** flaky HR/power + sleep deprivation. The classes **overlap in feature space by design** — say on the order of **15%** — because the observables muddy the causal story.
+
+Imagine a brittle rule:
+
+> Adjust $C$ until **exactly 5%** of training points are **violators** (support vectors with $\alpha_i \approx C$).
+
+On **Dataset A**, you **force needless slack**: the data could tolerate a sharper margin than that rule allows — you **underfit** despite a nearly learnable boundary. On **Dataset B**, an arbitrary 5% **cap** pushes the solver toward **fantasticated** boundaries separating noise that Statistics says should stay mixed — you **overfit** the quirks of brittle sensors rather than admitting irreducible ambiguity.
+
+So the **right** slack/violator **profile is not universal** — it is **emergent from the latent noise geography** you never observe directly.
+
+### Rigorous framing — logarithmic search and validation
+
+Because the socially “correct” number of bounded support vectors **is dataset-specific** and cannot be inferred from formulas alone — it comes from generator hidden from the analyst — practitioners **estimate** $C$ **empirically**.
+
+Two implementation facts matter:
+
+**1.** The margin geometry reacts to $C$ in a highly **nonlinear** way. Moving from $C = 1$ to $C = 2$ often changes almost nothing; **multiplicative** steps are what move the needle. That is why search spaces are usually **log-spaced**, e.g.
+
+$$
+C \in \{0.001,\, 0.01,\, 0.1,\, 1.0,\, 10,\, 100,\, 1000\}.
+$$
+
+**2.** The honest score is **out-of-sample** generalization, not in-sample violator counts. Standard practice: **$K$-fold cross-validation** on the training data — for each candidate $C$, average held-out performance across folds. The **winner** is whatever $(C, \gamma, \dots)$ pair maximizes that **validation** metric (accuracy, F1, cost-sensitive loss, etc.) — **independent** of picking a mythical global violator percentage.
+
+### The architect’s view — `GridSearchCV` in Python
+
+Rather than handwritten nested loops around `fit()`, scikit-learn composes **`GridSearchCV`**: Cartesian product over the hyperparameter grid, stratified slicing via `cv`, optional parallel evaluation.
+
+```python
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+
+# Logarithmic (and kernel) search grid
+param_grid = {
+    "C": [0.001, 0.01, 0.1, 1, 10, 100, 1000],
+    "gamma": ["scale", "auto", 0.1, 1, 10],
+}
+
+base_svm = SVC(kernel="rbf")
+
+tuner = GridSearchCV(estimator=base_svm, param_grid=param_grid, cv=5, n_jobs=-1)
+
+print("Initiating hyperparameter grid search...")
+tuner.fit(X_train, y_train)
+
+print(f"The best C (by CV mean score): {tuner.best_params_['C']}")
+print(f"The best gamma: {tuner.best_params_['gamma']}")
+print(f"Highest cross-validation accuracy: {tuner.best_score_ * 100:.2f}%")
+
+best_model = tuner.best_estimator_
+```
+
+`cv=5` retrains repeatedly on different folds; **`best_estimator_`** is already refit on **all** supplied training data — the object you serialize for downstream evaluation or deployment pipelines.
+
+### Diagnostic use — violators and SV counts *after* the search
+
+A **violator-ratio target** does **not** replace cross-validation — but inspecting **$\alpha_i$** structure on the **`best_estimator_`** remains a sharp **sanity probe**:
+
+**Red flag — likely overfitting / memorization vibes.** If essentially **every** slack variable is crushed to zero and **no** points sit at the **$\alpha = C$** ceiling while training accuracy is suspiciously perfect, the search may have landed on a **huge** $C$ (e.g. $1000$) that **memorizes** idiosyncrasies. Follow up with **held-out** metrics, learning curves, or simpler baselines.
+
+**Red flag — slack flood / marginal underfitting.** If **support vectors ≈ almost every training row** and $C$ is tiny, geometry has collapsed into something functionally permissive across the hull — widen the hyperparameter trajectory upward on the **log grid** before trusting the frontier.
+
+**Healthier heuristic (not a law).** A **fraction** of data acts as ordinary support vectors, and among those **some** nonzero chunk sits **near** $\alpha_i = C$ — evidence the **soft margin** genuinely trades fidelity against margin width instead of behaving like hard-margin extremism either direction.
+
+Interpret these patterns as **post-hoc microscopy** atop the **validated** champion — not as the optimizer’s objective.
+
+---
+
+## Part 10: The scale wall, kernel approximation, and nonlinear boundaries at enormous $n$
 
 If you need **many millions** of rows *and* a **highly complex, nonlinear** boundary, vanilla SVM tooling hits a structural wall rather than just a tuning problem:
 
@@ -557,7 +638,7 @@ If your cyclist point had `[Power, Cadence]` ($d = 2$), its image $Z(\mathbf{x})
 
 Approximation accuracy grows with **$D$**; cost grows linearly with $D$, not quadratically with $n$ inside the bottleneck that killed naive dual kernels.
 
-### Architect view — sklearn pipeline wiring
+### Sklearn pipeline wiring
 
 You do **not** hand-roll Bochner sampling in production: scikit-learn composes **`RBFSampler`** (implements the Fourier-style map) upstream of **`LinearSVC`** (primal hinge linear SVM):
 
@@ -594,9 +675,19 @@ You've now walked to the blunt failure geography of naive SVMs at web scale **an
 
 - An SVM finds the **widest street** between classes by **maximizing the margin** — geometrically, minimize $\lVert\mathbf{w}\rVert^2$ subject to one constraint per point.
 - **Hinge loss** and **slack variables** ($C$ knob) turn the formulation into a realistic, tunable trade-off between margin width and training mistakes.
+- **$C$ is not set by a universal violator quota** — ambiguity (Bayes-risk–like floors) differs by domain. Tune $C$ **empirically**, usually on a **log-spaced grid**, with **cross-validation** (e.g. `GridSearchCV`); use **bounded-SV / SV-count heuristics only as diagnostics** on the chosen model, not as the objective.
 - The same optimization problem can be solved **two distinct ways**, and **the choice is real** — you literally pick a different scikit-learn class:
   - **Primal Path** (`LinearSVC`) — direct, scales to huge $n$, **linear only**.
   - **Dual + Kernel Path** (`SVC`) — indirect via $\alpha_i$, supports **nonlinear** boundaries via kernels, but $O(n^2)$ memory caps the dataset size.
 - The Dual Path's payoff is the **kernel trick**: the dual depends *only* on inner products $\mathbf{x}_i \cdot \mathbf{x}_j$, so we replace them with $K(\mathbf{x}_i, \mathbf{x}_j)$ and get nonlinear boundaries without ever materializing the embedded coordinates.
 - The same sparsity that makes SVMs hard to overfit (only support vectors get $\alpha_i > 0$) also makes the **deployed model tiny and fast** at inference.
 - At **many millions × strongly nonlinear**, neither vanilla path solves everything in practice: primal stays linear in raw features; dual scales with something like **$n^2$ Gram storage** unless you rework the solver. Common industry pivots toward the **Rule Family** (**XGBoost** / **LightGBM**) or **neural nets**; if you remain in the equation family for margin-style guarantees, use **explicit kernel approximation** (`RBFSampler` + primal `LinearSVC` in one `Pipeline` approximates large-scale RBF-ish geometry without constructing the dense dual Gram matrix).
+
+---
+
+## Resources
+
+- **Learning: Support Vector Machines** — [YouTube lecture](https://www.youtube.com/watch?v=_PwhiWxHK8o)
+- **Primal** — [Cornell CS 4780 — Lecture 9: SVM](https://www.cs.cornell.edu/courses/cs4780/2018fa/lectures/lecturenote09.html)
+- **Dual** — [Cornell CS 4780 — Lecture 10: Empirical risk minimization](https://www.cs.cornell.edu/courses/cs4780/2018fa/lectures/lecturenote10.html)
+- **The Kernel Trick Calculus** — [Stanford CS229 — Notes 3 (PDF)](https://cs229.stanford.edu/notes2022fall/cs229-notes3.pdf)

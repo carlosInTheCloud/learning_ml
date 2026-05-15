@@ -8,4 +8,10 @@ lesson 1:
     * multivariable calculus
         * Lagrangian multipliers
     
-lesson 6 sidebar: Euclidean norm.
+lesson 6 sidebar: 
+    Euclidean norm.
+    Bayes error rate
+    K-Fold Cross-Validation.
+
+lesson 7 sidebar:
+    Taylor series approximation formula

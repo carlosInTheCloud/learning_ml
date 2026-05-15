@@ -49,13 +49,30 @@ print(f"Task 3: Support vectors {n_sv}, inactive {inactive}")
 #################################################################################
 # Task 4: Test the box constraint (`C`)
 #################################################################################
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
-
-sparse_svm = SVC(kernel='rbf', C=0.001)
+c_value = 0.5
+sparse_svm = SVC(kernel='rbf', C=c_value)
 sparse_svm.fit(X_train, y_train)
 
 print(f"Task 4: Sparse SVM accuracy: {accuracy_score(y_test, sparse_svm.predict(X_test))}")
 n_sv = sparse_svm.support_vectors_.shape[0]
 inactive = len(X_train) - n_sv
 print(f"Task 4: Support vectors {n_sv}, inactive {inactive}")
+
+#################################################################################
+# Task 5: From Task 4 — support vectors “on” the margin / at the box ceiling
+#################################################################################
+import numpy as np
+
+# Binary SVC: each column of dual_coef_ is α_i · y_i for one support vector;
+# take abs to recover α_i (0 ≤ α_i ≤ C). KKT: α_i ≈ C often means nonzero
+# slack (strict margin violated or on the wrong side of the ideal tube)—
+# counts as “bounded” support vectors vs free SVs with 0 < α_i << C on the edge.
+alphas = np.abs(sparse_svm.dual_coef_).ravel()
+C_fit = float(sparse_svm.C)
+
+at_box_ceiling = np.isclose(alphas, C_fit, rtol=0.0, atol=1e-6)
+n_box = int(np.sum(at_box_ceiling))
+n_free = int(alphas.size - n_box)
+
+print(f"Task 5: Support vectors with α ≈ C (bounded / margin-violating side): {n_box}")
+print(f"Task 5: Free support vectors (0 < α < C, on the margin in KKT sense): {n_free}")
