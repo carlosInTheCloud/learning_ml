@@ -233,6 +233,9 @@ Boosting steps are inherently **ordered**: tree 50 needs **updated targets / res
 | **Bagging (RF)** Deep / full | Parallel | **Variance** (overfitting noise) |
 | **Boosting** | Shallow, many | Sequential | **Bias** + residual shape via gradients |
 
+![Random Forest parallelizes at tree level (bootstrap → simultaneous trees → aggregation); XGBoost builds trees sequentially but parallelizes within each tree (e.g., simultaneous feature split search)](../images/random_forest_vs_xgbost_2.jpeg)
+
+
 ### Worked example — one gradient boosting step (classification)
 
 Targets: **Bonk = 1**, **No bonk = 0**.
@@ -317,6 +320,7 @@ $$
 3. Treat **too-fast convergence** with high $\nu$ as suspicious — check validation curves for instability.
 
 **Intuition:** $\nu$ is a **brake pedal** on how aggressively each tree corrects residuals; smaller $\nu$ often yields **better generalization** if you **buy** enough trees to compensate.
+
 
 ---
 
