@@ -1,77 +1,120 @@
-# Math rendering smoke test
+# Math rendering — round 2
 
-Disposable. Open in **MarkText** and view on **GitHub**. Note any block that fails in either.
+Round 1 result: GitHub rejects `\operatorname` (macro allowlist), and appears to strip the backslash from `\,` and `\|` inside `$$` before the math engine runs. MarkText accepted all of it.
+
+Below: every candidate replacement. **Report which letters render correctly in each viewer.** A candidate passes only if it works in both.
 
 ---
 
-**1. Inline math.** The design matrix is $X \in \mathbb{R}^{n \times d}$ and the parameter vector is $\theta \in \mathbb{R}^{d}$.
+## A. arg min
 
-**2. Display math.**
+**A1** — `\arg\min` with subscript
 
 $$
-J(\theta) = \frac{1}{2n} \sum_{i=1}^{n} \left( \theta^\top x^{(i)} - y^{(i)} \right)^2
+\hat{\theta} = \arg\min_{\theta \in \mathbb{R}^d} J(\theta)
 $$
 
-**3. Multi-line derivation (`aligned`).**
+**A2** — `\underset`
+
+$$
+\hat{\theta} = \underset{\theta \in \mathbb{R}^d}{\arg\min} \, J(\theta)
+$$
+
+**A3** — `\mathop` with `\limits`
+
+$$
+\hat{\theta} = \mathop{\arg\min}\limits_{\theta \in \mathbb{R}^d} J(\theta)
+$$
+
+**A4** — bare `\argmin` (KaTeX may define it; MathJax likely not)
+
+$$
+\hat{\theta} = \argmin_{\theta \in \mathbb{R}^d} J(\theta)
+$$
+
+**A5** — unstarred `\operatorname`, to confirm the whole macro is blocked
+
+$$
+\hat{\theta} = \operatorname{arg\,min}_{\theta} J(\theta)
+$$
+
+---
+
+## B. Norms
+
+**B1** — `\|` (round 1 suggests the backslashes are stripped)
+
+$$
+J(\theta) = \|X\theta - y\|_2^2 + \lambda \|\theta\|_2^2
+$$
+
+**B2** — `\lVert` / `\rVert`
+
+$$
+J(\theta) = \lVert X\theta - y \rVert_2^2 + \lambda \lVert \theta \rVert_2^2
+$$
+
+**B3** — `\Vert`
+
+$$
+J(\theta) = \Vert X\theta - y \Vert_2^2 + \lambda \Vert \theta \Vert_2^2
+$$
+
+---
+
+## C. Thin spaces
+
+**C1** — `\,`
+
+$$
+\mathbb{E}[X] = \int x \, p(x) \, dx
+$$
+
+**C2** — `\;`
+
+$$
+\mathbb{E}[X] = \int x \; p(x) \; dx
+$$
+
+**C3** — `\quad`
+
+$$
+\mathbb{E}[X] = \int x \quad p(x) \quad dx
+$$
+
+---
+
+## D. Other escape-prone constructs
+
+**D1** — `\\` line breaks inside `aligned` (used in every multi-line derivation)
 
 $$
 \begin{aligned}
-\nabla_\theta J(\theta)
-  &= \frac{1}{n} \sum_{i=1}^{n} \left( \theta^\top x^{(i)} - y^{(i)} \right) x^{(i)} \\
-  &= \frac{1}{n} X^\top (X\theta - y)
+\nabla_\theta J &= X^\top (X\theta - y) \\
+\theta^{[t+1]} &= \theta^{[t]} - \alpha \nabla_\theta J
 \end{aligned}
 $$
 
-**4. Matrices.**
+**D2** — `\{` `\}` braces
 
 $$
-X = \begin{bmatrix}
-  x_1^{(1)} & \cdots & x_d^{(1)} \\
-  \vdots    & \ddots & \vdots \\
-  x_1^{(n)} & \cdots & x_d^{(n)}
-\end{bmatrix}
-\qquad
-\Sigma = \frac{1}{n} X^\top X
+\mathbb{1}\{ y^{(i)} = k \}
 $$
 
-**5. Operators and norms.**
+**D3** — `\_` and underscores in `\text`
 
 $$
-\hat{\theta} = \operatorname*{arg\,min}_{\theta \in \mathbb{R}^d} \; \|X\theta - y\|_2^2 + \lambda \|\theta\|_2^2
+L_{\text{train}} < L_{\text{test}}
 $$
 
-**6. Cases.**
+**D4** — inline math with an underscore mid-sentence: the value $\theta_j$ at step $t$.
 
-$$
-\ell(z) =
-\begin{cases}
-  0        & \text{if } z \geq 1 \\
-  1 - z    & \text{otherwise}
-\end{cases}
-$$
+---
 
-**7. Annotation and bold symbols.**
+## E. Control
 
-$$
-\underbrace{\mathbb{E}\left[(\hat{f}(x) - f(x))^2\right]}_{\text{MSE}}
-= \underbrace{\text{Bias}^2}_{\boldsymbol{b}} + \underbrace{\text{Var}}_{\boldsymbol{v}}
-$$
-
-**8. Underscores next to text** (a known GitHub parser trap): the loss $L_{\text{train}}$ versus $L_{\text{test}}$.
-
-**9. Fenced `math` block** (GitHub-only syntax; expected to render as a *code block* in MarkText — confirming this is why we avoid it):
+**E1** — fenced `math` block. Expected: renders on GitHub, shows as a code block in MarkText.
 
 ```math
 p(y \mid x; \theta) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{(y - \theta^\top x)^2}{2\sigma^2}\right)
-```
-
-**10. Code block with math nearby.**
-
-```python
-import numpy as np
-
-def grad(X: np.ndarray, y: np.ndarray, theta: np.ndarray) -> np.ndarray:
-    """Gradient of MSE: (1/n) X^T (X theta - y)."""
-    n = X.shape[0]
-    return X.T @ (X @ theta - y) / n
 ```
