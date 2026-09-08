@@ -1,7 +1,12 @@
 # Learning ML
 
-A from-scratch, graduate-level machine learning curriculum, calibrated to Stanford's CS229 / CS230 / CS231n / CS224n.
-Every model is derived from first principles, implemented in NumPy, and verified numerically.
+A from-scratch, graduate-level machine learning curriculum. Every model is derived from first
+principles, implemented in NumPy, and verified numerically.
+
+Depth and scope are calibrated to courses such as Stanford's CS229, CS230, CS231n, and CS224n.
+*This project is not affiliated with, endorsed by, or sponsored by Stanford University, and is not
+a substitute for those courses or for any university program. Course names are used only to
+describe the level of rigor aimed at. All material here is written independently.*
 
 The standing rules for this repository live in [`OKF/`](OKF/):
 

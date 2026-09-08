@@ -106,7 +106,16 @@ Fixed so that identical expressions are written identically everywhere:
 - **State without proving** standard results that part 1 does not cover — the spectral theorem, measure-theoretic foundations of probability, convergence theorems from real analysis. State the result precisely, state its hypotheses, cite a source, and move on. Do not silently assume it.
 - **Never use a result whose hypotheses have not been stated.** A cited theorem the reader cannot check the conditions of is a black box wearing a name.
 
-## 4. Code standards
+## 4. Originality
+
+All material is written from scratch. The program names university courses to calibrate difficulty, not to track their contents.
+
+- **Never reproduce** another course's lecture notes, problem sets, solutions, figures, slides, or distinctive phrasing — from any source, including memory. This applies to exercises above all: an exercise that reads like it was lifted from a known problem set must be rewritten.
+- **Freely use** standard mathematical results, standard notation, and the topics themselves. Facts, theorems, and curriculum outlines are not anyone's property; the normal equations belong to no one.
+- **Cite** any external source a subtopic draws on — a textbook, a paper, a set of published notes — by name in the theory file.
+- The test: could this derivation, exercise, or explanation have been written by someone who had learned the subject and then closed every book? If not, rewrite it.
+
+## 5. Code standards
 
 - **NumPy, vectorized.** No Python loop over training examples. Loops over iterations, layers, or folds are fine. The implementation should be readable as the equation it came from.
 - **Shapes are documented and asserted.** Every public function's docstring gives the shape of each argument and its return using the symbols above — `(n, d)`, `(d,)`. Shape assertions belong in the tests.
@@ -133,7 +142,7 @@ Every implementation ships with `test_{subtopic_name}.py`:
 - Tests state what they verify. A test named `test_gradient` that asserts a number is not a verification.
 - Tests are written against the stub's signature and must fail cleanly — `NotImplementedError`, not an import error — before the reader has implemented anything.
 
-## 5. Prose
+## 6. Prose
 
 - The theory file opens with **why the problem exists** before any formalism.
 - One idea per section; heading levels do not skip.
