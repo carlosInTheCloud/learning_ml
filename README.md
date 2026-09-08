@@ -20,7 +20,7 @@ The standing rules for this repository live in [`OKF/`](OKF/):
 
 ## Progress
 
-**0 / 143 core** subtopics complete &nbsp;·&nbsp; **0 / 35 extension** &nbsp;·&nbsp; 178 total
+**1 / 143 core** subtopics complete &nbsp;·&nbsp; **0 / 35 extension** &nbsp;·&nbsp; 178 total
 
 Unmarked entries are **core** — the critical path. Entries marked *ext* are safely deferrable on a first pass;
 nothing later in the program derives from them.
@@ -31,7 +31,7 @@ nothing later in the program derives from them.
 
 **1.1 Linear Algebra**
 
-- [ ] 1.1.1 Vectors and matrices
+- [x] 1.1.1 Vectors and matrices
 - [ ] 1.1.2 Matrix operations and norms
 - [ ] 1.1.3 Projections and subspaces
 - [ ] 1.1.4 Quadratic forms and positive definiteness
