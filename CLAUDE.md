@@ -21,6 +21,7 @@ Shorthand used in this repository and in conversation:
 | Term | Means |
 |---|---|
 | `gh` | GitHub — the hosting platform, or the `gh` CLI, depending on context |
+| gen / gening | Generate / generating — authoring material for a subtopic |
 | OKF | The `OKF/` folder of standing rules; also used for the rules themselves |
 | part / topic / subtopic | The three levels of the curriculum tree — see [OKF/agent_teaching_method.md](OKF/agent_teaching_method.md) |
 | core / extension | Whether a subtopic is on the critical path or safely deferrable — see [OKF/overall_program.md](OKF/overall_program.md) |
