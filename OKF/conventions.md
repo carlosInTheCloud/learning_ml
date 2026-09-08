@@ -39,8 +39,8 @@ Fixed for the whole program. A subtopic that needs a symbol not listed here defi
 | $\nabla_\theta J$ | gradient of $J$ with respect to $\theta$ |
 | $H$ | Hessian |
 | $\sigma(\cdot)$ | logistic sigmoid |
-| $\mathbb{1}\{\cdot\}$ | indicator function |
-| $\mathbb{E}[\cdot]$, $\operatorname{Var}(\cdot)$ | expectation, variance |
+| $\mathbf{1}[\cdot]$ | indicator function |
+| $\mathbb{E}[\cdot]$, $\mathrm{Var}(\cdot)$ | expectation, variance |
 | $\|\cdot\|_2$ | Euclidean norm |
 
 ### Rules
@@ -55,25 +55,47 @@ Fixed for the whole program. A subtopic that needs a symbol not listed here defi
 
 ## 2. Math rendering
 
-Files must render in **GitHub** (MathJax) and **MarkText** (KaTeX). The two engines overlap but are not identical, so material is written to their intersection, with KaTeX — the smaller set — as the binding constraint.
+Files must render in **GitHub** (MathJax) and **MarkText** (KaTeX). The two engines overlap but are not identical, so material is written to their intersection. Neither is the binding constraint on its own — each rejects things the other accepts — so the rules below come from testing both, not from either engine's documentation.
 
 - **Inline math:** `$ ... $`
 - **Display math:** `$$ ... $$`, each delimiter on its own line, with a blank line before the opening one.
 
-Prohibited, each because one of the two engines fails on it:
+### Prohibited
 
-| Do not use | Why |
-|---|---|
-| ` ```math ` fenced blocks | GitHub-only; MarkText renders them as a code block |
-| `\[ ... \]`, `\( ... \)` | Not recognized by GitHub's markdown math |
-| `\bm` | Not in KaTeX — use `\boldsymbol` |
-| bare `\begin{align}` | Use `aligned` inside `$$` |
-| `\newcommand` / macro definitions | GitHub renders each block independently; macros do not carry across blocks or files |
-| `\label` / `\ref` | Unsupported in both |
+| Do not use | Instead | Why |
+|---|---|---|
+| ` ```math ` fenced blocks | `$$ ... $$` | Renders on GitHub; MarkText shows a code block |
+| `\[ ... \]`, `\( ... \)` | `$$ ... $$`, `$ ... $` | Not recognized by GitHub's markdown math |
+| `\operatorname`, `\operatorname*` | `\underset{...}{\arg\min}` | Blocked by GitHub's macro allowlist |
+| `\argmin`, `\argmax` | `\underset{\theta}{\arg\min}` | KaTeX-only; undefined on GitHub |
+| `\mathbb{1}` | `\mathbf{1}` | Blackboard bold has no digit glyphs on GitHub |
+| `\underbrace`, `\overbrace` | a following line of prose, or `\text` inside `aligned` | The brace glyph draws malformed on GitHub |
+| `\{ ... \}` | `\lbrace ... \rbrace`, or `[ ... ]` for indicators | Fails on GitHub; markdown escaping is the likely cause |
+| `\bm` | `\boldsymbol` | Not in KaTeX |
+| bare `\begin{align}` | `aligned` inside `$$` | `align` is unsupported |
+| `\newcommand`, `\DeclareMathOperator` | write the expression out | GitHub renders each block independently — macros do not carry across blocks or files |
+| `\label`, `\ref` | number equations in prose | Unsupported in both |
 
-Safe and used throughout: `aligned`, `array`, `cases`, `matrix` / `pmatrix` / `bmatrix` / `vmatrix`, `\operatorname*{arg\,min}`, `\underbrace`, `\mathbb`, `\mathcal`, `\boldsymbol`, `\text`.
+### Verified working in both
 
-> Verified in MarkText. GitHub verification pending — see `_render_test.md`.
+`aligned` · `array` · `cases` · `matrix` / `pmatrix` / `bmatrix` / `vmatrix` · `\\` line breaks inside `aligned` · `\arg\min` with a subscript · `\underset` · `\mathop{...}\limits` · `\|`, `\lVert`/`\rVert`, `\Vert` · `\,` `\;` `\quad` · `\mathbb` (letters) · `\mathbf` · `\mathcal` · `\mathrm` · `\boldsymbol` · `\text` · `\top` · `\frac` · `\sum` · `\int` · `\partial` · `\nabla` · `\hat` · underscores inside `\text` · inline math containing underscores.
+
+### Standard spellings
+
+Fixed so that identical expressions are written identically everywhere:
+
+| Expression | Write | Renders |
+|---|---|---|
+| argmin | `\underset{\theta}{\arg\min}` | $\underset{\theta}{\arg\min}$ |
+| argmax | `\underset{\theta}{\arg\max}` | $\underset{\theta}{\arg\max}$ |
+| indicator | `\mathbf{1}[y = k]` | $\mathbf{1}[y = k]$ |
+| norm | `\|\theta\|_2^2` | $\|\theta\|_2^2$ |
+| variance | `\mathrm{Var}(\cdot)` | $\mathrm{Var}(\cdot)$ |
+| transpose | `\theta^\top` | $\theta^\top$ |
+
+`\arg\min_{\theta}` also renders in both and is acceptable inline, where `\underset` sets awkwardly. In display math use `\underset`.
+
+> Verified in GitHub and MarkText, September 2026. Re-test if either renderer changes.
 
 ## 3. Derivation policy
 

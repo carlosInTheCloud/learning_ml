@@ -13,3 +13,14 @@ The `OKF/` folder holds the standing rules and context for this project. Read **
 - [OKF/postponed.md](OKF/postponed.md) — subjects deliberately kept out of the current program, and the seed of a follow-up one.
 
 If new files are added to `OKF/`, read them too and apply them the same way.
+
+## Vocabulary
+
+Shorthand used in this repository and in conversation:
+
+| Term | Means |
+|---|---|
+| `gh` | GitHub — the hosting platform, or the `gh` CLI, depending on context |
+| OKF | The `OKF/` folder of standing rules; also used for the rules themselves |
+| part / topic / subtopic | The three levels of the curriculum tree — see [OKF/agent_teaching_method.md](OKF/agent_teaching_method.md) |
+| core / extension | Whether a subtopic is on the critical path or safely deferrable — see [OKF/overall_program.md](OKF/overall_program.md) |
