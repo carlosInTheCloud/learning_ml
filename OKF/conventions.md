@@ -115,6 +115,14 @@ Fixed so that identical expressions are written identically everywhere:
 - **Type hints on public functions.**
 - **Numerical stability is handled, not mentioned.** Log-sum-exp where sums of exponentials appear; solve rather than invert; explicit conditioning or regularization where a matrix may be near-singular.
 
+### Stubs, solutions, and the shared package
+
+- The stub (`{subtopic_name}.py`) carries the full signature, a docstring giving every shape, and `raise NotImplementedError`. It is not a sketch: everything except the body is finished, so the reader implements the algorithm and nothing else.
+- The solution (`{subtopic_name}_solution.py`) is byte-for-byte compatible in signature. A test written against one runs unchanged against the other.
+- Verify a suite by putting the solution in the stub's place and running it. Ship the stub unimplemented.
+- Shared infrastructure — gradient checking, synthetic data, plotting — lives in `mlfs/` at the repository root and is imported directly (`from mlfs import numerical_gradient`). The root `conftest.py` makes this work from any depth.
+- An implementation is promoted to `mlfs/models/` only after its own subtopic is complete, and never before.
+
 ### Tests
 
 Every implementation ships with `test_{subtopic_name}.py`:
@@ -123,6 +131,7 @@ Every implementation ships with `test_{subtopic_name}.py`:
 - **Equivalence** with a closed-form solution, or with `scikit-learn` / `scipy` on synthetic data, to a stated tolerance.
 - **Shape and edge cases:** single example, single feature, perfectly separable or perfectly collinear data.
 - Tests state what they verify. A test named `test_gradient` that asserts a number is not a verification.
+- Tests are written against the stub's signature and must fail cleanly — `NotImplementedError`, not an import error — before the reader has implemented anything.
 
 ## 5. Prose
 
