@@ -17,6 +17,8 @@ Every symbol used below, how to say it, and what to call it out loud. Skim it no
 | $\mathbb{R}^{d}$ | "are dee" | the space of lists of $d$ real numbers |
 | $x \in \mathbb{R}^{d}$ | "x is in are dee" | $x$ is a list of $d$ real numbers |
 | $x_j$ | "x jay" | feature $j$ of a generic example |
+| $c$ | "see" | a scalar — a single number, as opposed to a vector |
+| $(x + z)_j$ | "the jay-th entry of x plus z" | a subscript on an expression picks one entry of the result |
 | $x^{(i)}$ | "x i" | the $i$-th example — parentheses mark an index, not a power |
 | $X$ | "capital X" | the design matrix — the whole table of data |
 | $\theta$ | "theta" | the parameter vector — one weight per feature |
@@ -85,15 +87,29 @@ There is a third requirement, and it is the one people underestimate — but it 
 
 > **Deferred to part 3.** Deciding *which* features to record, and turning raw records into numbers that satisfy those requirements, is a subject in its own right — missing values, categories that are words rather than numbers, quantities on wildly different scales. All of it is treated properly in **part 3, Data Processing and Feature Engineering**. For the whole of part 1 you may assume the features are already chosen and already numeric.
 
-Two operations are defined, and they are the only two:
+Two operations are defined on vectors, and they are the only two. Both have standard names, and it is worth using them.
+
+**Vector addition**, written $x + z$ — add the two vectors entry by entry:
 
 $$
 (x + z)_j = x_j + z_j
-\qquad\qquad
+$$
+
+**Scalar multiplication**, written $c\,x$ — multiply every entry by the same single number:
+
+$$
 (c\,x)_j = c\,x_j
 $$
 
-for $c \in \mathbb{R}$. Everything else in linear algebra is built from these. Combining them gives the **linear combination**, the single most important expression in the subject:
+Here $c \in \mathbb{R}$, say "*c is in are*": $c$ is an ordinary number. A single number is called a **scalar**, the word used whenever it needs distinguishing from a vector or a matrix.
+
+Both operations are **componentwise**, also called **elementwise**: the rule is applied to each position independently, and entries at different positions never interact. Keep that word — NumPy's `+` and `*` on arrays are exactly these two operations, and "elementwise" is how their behaviour is described in every error message and manual page you will read.
+
+One piece of notation, since it recurs: read $(x + z)_j$ as "*the jay-th entry of the vector x plus z*". A subscript attached to a parenthesised expression always means "one entry of whatever that expression evaluates to" — the same pattern returns as $(Ax)_i$ in section 4.
+
+A set carrying these two operations, and obeying the handful of rules you would expect of them — addition commutes, scalar multiplication distributes over addition, and so on — is called a **vector space**. $\mathbb{R}^{d}$ is the only vector space this program needs, and none of the axioms are ever invoked by name, so the term is here to be recognised rather than memorised.
+
+Everything else in linear algebra is built from these two. Combining them gives the **linear combination**, the single most important expression in the subject:
 
 $$
 c_1 v_1 + c_2 v_2 + \cdots + c_k v_k
