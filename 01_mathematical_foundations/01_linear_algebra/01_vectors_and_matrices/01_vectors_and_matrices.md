@@ -61,15 +61,27 @@ Two readings of the same object, and you need both:
 - **As a point.** $x$ is a location in $d$-dimensional space. This reading makes distance, angle, and projection meaningful — the content of 1.1.2 and 1.1.3.
 - **As data.** $x$ is one example — one house, one email, one patient — and $x_j$, say "*x jay*", is one **feature** of it: a single number recorded about that example. How many features there are is $d$.
 
-A house might be recorded by its floor area in square feet, its number of bedrooms, the year it was built, and its distance in miles to the nearest school. Then $d = 4$, and that house *is* the vector
+The example and its features always come as a pair. Naming one without the other is what makes this definition feel slippery, so here are all three:
+
+| One example, $x$ | Its features, $x_1, x_2, x_3, x_4$ |
+|---|---|
+| a house | floor area in square feet · number of bedrooms · year built · miles to the nearest school |
+| an email | number of words · number of links · how many times the word "free" appears · whether the sender is already in your contacts, as $1$ or $0$ |
+| a patient | age in years · resting heart rate · systolic blood pressure · whether a particular gene variant is present, as $1$ or $0$ |
+
+Each row is one example type; each cell to its right is $d = 4$ numbers describing it. Notice that the features are not all the same kind of thing — some are continuous quantities, some are counts, and some are yes-or-no facts written as $1$ and $0$. All three are features, because all three are numbers.
+
+Take the house. It *is* the vector
 
 $$
 x = \begin{bmatrix} 1850 \\ 3 \\ 1974 \\ 0.8 \end{bmatrix} \in \mathbb{R}^{4}
 $$
 
-with $x_1 = 1850$, $x_2 = 3$, and so on.
+so $x_1 = 1850$ is its floor area, $x_2 = 3$ its bedroom count, $x_3 = 1974$ the year it was built, and $x_4 = 0.8$ its distance to a school. The same house, written as one object.
 
-A feature need not be something physically measured with an instrument. It can be a count, a category turned into a number — has a garage: $1$ or $0$ — or a quantity derived from other features, such as price per square foot. Three things are required of it, and only these three: it is **one number**, it is present for **every** example, and it always sits in the **same position**. That last requirement is the one people underestimate. If $x_2$ means "bedrooms" for one house and "bathrooms" for another, the vector is meaningless and every result in this program silently breaks. Turning messy records into features that satisfy all three is the subject of part 3.
+Three things are required of a feature, and only these three: it is **one number**, it is present for **every** example, and it always sits in the **same position**. That last requirement is the one people underestimate. If $x_2$ means "bedrooms" for one house and "bathrooms" for another, the vector is meaningless and every result in this program silently breaks.
+
+> **Deferred to part 3.** Deciding *which* features to record, and turning raw records into numbers that satisfy the three requirements, is a subject in its own right — missing values, categories that are words rather than numbers, quantities on wildly different scales. All of it is treated properly in **part 3, Data Processing and Feature Engineering**. For the whole of part 1 you may assume the features are already chosen and already numeric.
 
 Two operations are defined, and they are the only two:
 

@@ -185,5 +185,7 @@ Every implementation ships with `test_{subtopic_name}.py`:
 - The theory file opens with a **symbol table** — every symbol the subtopic uses, how it is spoken, and what it is called — and then with **why the problem exists**, before any formalism.
 - **Every symbol is glossed at its first appearance in prose**, giving how it is said aloud and the name a person would use for it out loud: "the product $X\theta$ — say *X theta*, the design matrix times the parameter vector". Only the first appearance, and only for symbols new to the subtopic. A reader who cannot pronounce an expression cannot rehearse it, and cannot ask anyone about it.
 - One idea per section; heading levels do not skip.
+- **An example that names several cases carries all of them through.** Introducing an idea with "a house, an email, a patient" and then illustrating only the house leaves the other two as decoration and the reader with an unfinished circle. Either follow through on every case named, or name one.
+- **When a subtopic defers something, it says so explicitly, and says where.** A reader who cannot tell the difference between "this was not explained" and "this is explained in part 3" will assume the former and go looking. Mark the deferral, name the part, and say what may be assumed in the meantime.
 - Derivations show intermediate steps. A step justified by a non-obvious identity names the identity.
 - British/American spelling is not policed; be consistent within a file.
