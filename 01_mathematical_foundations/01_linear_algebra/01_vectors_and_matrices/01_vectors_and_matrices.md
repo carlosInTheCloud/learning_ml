@@ -79,9 +79,11 @@ $$
 
 so $x_1 = 1850$ is its floor area, $x_2 = 3$ its bedroom count, $x_3 = 1974$ the year it was built, and $x_4 = 0.8$ its distance to a school. The same house, written as one object.
 
-Three things are required of a feature, and only these three: it is **one number**, it is present for **every** example, and it always sits in the **same position**. That last requirement is the one people underestimate. If $x_2$ means "bedrooms" for one house and "bathrooms" for another, the vector is meaningless and every result in this program silently breaks.
+Two things are already visible from this single vector. A feature is **one number** — not a sentence, not a category, not a pair. And its **position carries its meaning**: slot 2 holds the bedroom count only because we decided slot 2 holds the bedroom count. Nothing about the number $3$ says "bedrooms". Strip the labels away and $x$ is four anonymous numbers whose order is the only thing telling you what they are.
 
-> **Deferred to part 3.** Deciding *which* features to record, and turning raw records into numbers that satisfy the three requirements, is a subject in its own right — missing values, categories that are words rather than numbers, quantities on wildly different scales. All of it is treated properly in **part 3, Data Processing and Feature Engineering**. For the whole of part 1 you may assume the features are already chosen and already numeric.
+There is a third requirement, and it is the one people underestimate — but it is a statement about a *collection* of examples rather than about any one of them, and so far you have seen exactly one. It waits for **section 8**, where the examples get stacked into a table and the requirement has something to constrain.
+
+> **Deferred to part 3.** Deciding *which* features to record, and turning raw records into numbers that satisfy those requirements, is a subject in its own right — missing values, categories that are words rather than numbers, quantities on wildly different scales. All of it is treated properly in **part 3, Data Processing and Feature Engineering**. For the whole of part 1 you may assume the features are already chosen and already numeric.
 
 Two operations are defined, and they are the only two:
 
@@ -287,9 +289,23 @@ Say it as "*capital X is in are, en by dee; row i of X is x i transpose*". The s
 
 $n$ examples down, $d$ features across. Examples are **rows**. This matches NumPy, pandas, and scikit-learn, so the mathematics and the code agree without a transpose sitting between them. A good deal of the literature uses the opposite convention; mixing the two is the most common way to produce a program that runs, returns the wrong shape, and gives no error.
 
-Note the small clash of readings: $x^{(i)}$ is a **column** vector in $\mathbb{R}^{d}$, but it appears in $X$ as a **row**. Hence the transpose in the line above. This is not an inconsistency to be fixed — it is the reason $X^\top$ appears as often as it does.
+### 8.1 Column and row, and why they swap
 
-### 8.1 The intercept
+This clash of readings is worth pausing on, because by now you have probably built the other picture. A lone example $x^{(i)}$ is a **column** vector in $\mathbb{R}^{d}$ — that is how it was drawn in section 2, and it is what "vectors are columns" means. But when examples are stacked into $X$, each one is laid on its side and becomes a **row**. That is exactly what the transpose in the line above is doing: $\left( x^{(i)} \right)^\top$ is the example, turned from a column into a row so it can be a row of the table.
+
+So inside $X$, **rows are examples and columns are features**, which is the reverse of the standalone picture. Both are correct, and both are needed. The swap between them is the reason $X^\top$ appears as often as it does throughout this program.
+
+### 8.2 The third requirement, at last
+
+Section 2 left one requirement unstated because a single example could not make it visible. Here it can.
+
+A **column** of $X$ is one feature across every example: column 2 holds the bedroom count of house 1, then house 2, then house 3, all the way down $n$ rows. That is only a meaningful thing to read if slot 2 means "bedrooms" for **every single row**.
+
+Suppose one record put bathrooms in slot 2 instead. Nothing breaks. There is no error — $X$ is still a perfectly good rectangle of numbers, every product below is still defined, every shape still conforms. But column 2 has stopped being a feature. It is now a blend of two unrelated quantities, and every number computed from it, all the way to the model's final predictions, is quietly meaningless.
+
+That is why the requirement belongs to the collection rather than to any one example, and why it is worth stating carefully: it is invisible to the computer and invisible to the mathematics, and only a person checking the data can catch it.
+
+### 8.3 The intercept
 
 A linear model should be able to represent $h(x) = b + w^\top x$ with an offset $b$. Rather than carry $b$ separately, prepend a constant coordinate $x_0 = 1$ to every example. Then with $\theta = (b, w_1, \ldots)^\top$,
 
@@ -301,7 +317,7 @@ The affine model becomes linear, at the cost of one column of ones. Every $d$ in
 
 Part 9 drops the convention: neural network layers keep weights $W$ and biases $b$ apart, because a layer is applied to many different inputs and appending ones to each is wasteful and awkward. The convention is a convenience, not a law.
 
-### 8.2 Three objects you will meet constantly
+### 8.4 Three objects you will meet constantly
 
 With $X \in \mathbb{R}^{n \times d}$, $\theta \in \mathbb{R}^{d}$, $y \in \mathbb{R}^{n}$:
 
@@ -375,7 +391,7 @@ for t in range(k):
 
 The loop runs over the shared dimension, not over examples or entries, so each iteration is a full vectorized outer product. The memory is $O(mp)$ rather than $O(mkp)$ — the same trade a streaming algorithm makes when it accumulates over data it cannot hold at once.
 
-The remaining three are the ML shapes: `add_intercept` prepends the ones column of section 8.1, `predict` computes $X\theta$, and `gram` computes $X^\top X$.
+The remaining three are the ML shapes: `add_intercept` prepends the ones column of section 8.3, `predict` computes $X\theta$, and `gram` computes $X^\top X$.
 
 ---
 
