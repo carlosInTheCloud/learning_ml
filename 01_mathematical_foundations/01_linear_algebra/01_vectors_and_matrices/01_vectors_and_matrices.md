@@ -34,9 +34,9 @@ Every symbol used below, how to say it, and what to call it out loud. Skim it no
 
 ## 1. Why this comes first
 
-A learning algorithm is handed a table. Rows are things that happened — a house that sold, an email that arrived, a patient who was scanned. Columns are the measurements taken of each one. Somewhere there is also a column of outcomes, and the job is to find a rule that turns a row into its outcome.
+A learning algorithm is handed a table. Rows are things that happened — a house that sold, an email that arrived, a patient who was scanned. Columns are the **features**: the individual numbers recorded about each one. Somewhere there is also a column of outcomes, and the job is to find a rule that turns a row into its outcome.
 
-You could write that rule as a loop. For each of the $n$ rows, multiply each of the $d$ measurements by its weight, add them up, and record the answer. That description is correct, and it is how almost everyone first understands regression.
+You could write that rule as a loop. For each of the $n$ rows, multiply each of the $d$ features by its weight, add them up, and record the answer. That description is correct, and it is how almost everyone first understands regression.
 
 It is also the wrong level of abstraction, for three reasons that will not go away:
 
@@ -59,7 +59,17 @@ $$
 Two readings of the same object, and you need both:
 
 - **As a point.** $x$ is a location in $d$-dimensional space. This reading makes distance, angle, and projection meaningful — the content of 1.1.2 and 1.1.3.
-- **As data.** $x$ is one example: one house, one email, one patient, with $x_j$ — say "*x jay*" — the $j$-th measurement of it. This reading is why $d$ is called the number of features.
+- **As data.** $x$ is one example — one house, one email, one patient — and $x_j$, say "*x jay*", is one **feature** of it: a single number recorded about that example. How many features there are is $d$.
+
+A house might be recorded by its floor area in square feet, its number of bedrooms, the year it was built, and its distance in miles to the nearest school. Then $d = 4$, and that house *is* the vector
+
+$$
+x = \begin{bmatrix} 1850 \\ 3 \\ 1974 \\ 0.8 \end{bmatrix} \in \mathbb{R}^{4}
+$$
+
+with $x_1 = 1850$, $x_2 = 3$, and so on.
+
+A feature need not be something physically measured with an instrument. It can be a count, a category turned into a number — has a garage: $1$ or $0$ — or a quantity derived from other features, such as price per square foot. Three things are required of it, and only these three: it is **one number**, it is present for **every** example, and it always sits in the **same position**. That last requirement is the one people underestimate. If $x_2$ means "bedrooms" for one house and "bathrooms" for another, the vector is meaningless and every result in this program silently breaks. Turning messy records into features that satisfy all three is the subject of part 3.
 
 Two operations are defined, and they are the only two:
 
@@ -105,7 +115,7 @@ A **matrix** $A \in \mathbb{R}^{m \times n}$ — say "*A is in are, em by en*" �
 
 Like vectors, matrices carry two readings, and confusing them is the single most common source of transposed-shape bugs:
 
-- **As data.** A table. Row $i$ is the $i$-th example; column $j$ is the $j$-th feature measured across all examples. This is what the design matrix is.
+- **As data.** A table. Row $i$ is the $i$-th example; column $j$ holds feature $j$ across all examples. This is what the design matrix is.
 - **As a linear map.** $A$ is a function that eats a vector in $\mathbb{R}^{n}$ and returns a vector in $\mathbb{R}^{m}$, and it is precisely a function satisfying
 
 $$
