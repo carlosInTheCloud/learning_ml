@@ -6,6 +6,32 @@
 
 ---
 
+## Symbols in this subtopic
+
+Every symbol used below, how to say it, and what to call it out loud. Skim it now; the text glosses each one again where it first appears.
+
+| Symbol | Say it | What it is |
+|---|---|---|
+| $n$ | "en" | number of examples — the rows of your data |
+| $d$ | "dee" | number of features — the columns |
+| $\mathbb{R}^{d}$ | "are dee" | the space of lists of $d$ real numbers |
+| $x \in \mathbb{R}^{d}$ | "x is in are dee" | $x$ is a list of $d$ real numbers |
+| $x_j$ | "x jay" | feature $j$ of a generic example |
+| $x^{(i)}$ | "x i" | the $i$-th example — parentheses mark an index, not a power |
+| $X$ | "capital X" | the design matrix — the whole table of data |
+| $\theta$ | "theta" | the parameter vector — one weight per feature |
+| $X\theta$ | "X theta" | the vector of predictions, one per example |
+| $y$ | "y" | the vector of true labels |
+| $A_{ij}$ | "A i jay" | the entry of $A$ in row $i$, column $j$ |
+| $A_{:,j}$ | "column jay of A" | one whole column |
+| $A^\top$ | "A transpose" | $A$ reflected across its diagonal |
+| $x^\top z$ | "x transpose z" | the inner product of $x$ and $z$ — a single number |
+| $X^\top X$ | "X transpose X" | the Gram matrix |
+| $\sum_{i=1}^{n}$ | "sum from i equals one to en" | add up over all $n$ examples |
+| $I$ | "the identity" | the matrix that changes nothing |
+
+---
+
 ## 1. Why this comes first
 
 A learning algorithm is handed a table. Rows are things that happened — a house that sold, an email that arrived, a patient who was scanned. Columns are the measurements taken of each one. Somewhere there is also a column of outcomes, and the job is to find a rule that turns a row into its outcome.
@@ -15,7 +41,7 @@ You could write that rule as a loop. For each of the $n$ rows, multiply each of 
 It is also the wrong level of abstraction, for three reasons that will not go away:
 
 1. **It is slow.** A Python loop over a million rows is thousands of times slower than the same arithmetic dispatched to a linear algebra library, which uses cache blocking and vector instructions you are not going to write yourself.
-2. **It hides the structure.** Written as a loop, "the vector of all predictions" is an accident of the code. Written as $X\theta$, it is a single object with properties — and one of those properties, that every achievable prediction vector lies in the column space of $X$, is the entire geometric content of least squares.
+2. **It hides the structure.** Written as a loop, "the vector of all predictions" is an accident of the code. Written as $X\theta$ — say "*X theta*": the table of data $X$ ("capital X") multiplied by the list of weights $\theta$ ("theta", a Greek letter, the standard name for a model's parameters) — it is a single object with properties — and one of those properties, that every achievable prediction vector lies in the column space of $X$, is the entire geometric content of least squares.
 3. **It does not survive differentiation.** In part 1.2 you will differentiate a cost with respect to $\theta$. Differentiating $X\theta$ is a one-line matrix calculus rule. Differentiating a loop is not a thing you can do.
 
 So the first job is to build the language in which the rest of the program is written. This subtopic covers exactly that: what vectors and matrices are, what multiplying them means, and why the design matrix is laid out the way it is. Norms and distances are 1.1.2; subspaces and projections are 1.1.3. Here we build the objects and the product.
@@ -24,7 +50,7 @@ So the first job is to build the language in which the rest of the program is wr
 
 ## 2. Vectors
 
-A **vector** in $\mathbb{R}^{d}$ is an ordered list of $d$ real numbers. Throughout this program a vector is a **column**:
+A **vector** in $\mathbb{R}^{d}$ — say "*are dee*", the space of all lists of $d$ real numbers — is an ordered list of $d$ real numbers. When you see $x \in \mathbb{R}^{d}$, say "*x is in are dee*": it announces the type of $x$ the way a signature announces the type of a function argument. Throughout this program a vector is a **column**:
 
 $$
 x = \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_d \end{bmatrix} \in \mathbb{R}^{d}
@@ -33,7 +59,7 @@ $$
 Two readings of the same object, and you need both:
 
 - **As a point.** $x$ is a location in $d$-dimensional space. This reading makes distance, angle, and projection meaningful — the content of 1.1.2 and 1.1.3.
-- **As data.** $x$ is one example: one house, one email, one patient, with $x_j$ the $j$-th measurement of it. This reading is why $d$ is called the number of features.
+- **As data.** $x$ is one example: one house, one email, one patient, with $x_j$ — say "*x jay*" — the $j$-th measurement of it. This reading is why $d$ is called the number of features.
 
 Two operations are defined, and they are the only two:
 
@@ -59,6 +85,8 @@ $$
 x^\top z = \sum_{j=1}^{d} x_j z_j \in \mathbb{R}
 $$
 
+Read the left side as "*x transpose z*", and the whole line as "*x transpose z is the sum, from j equals one to dee, of x jay times z jay*". The raised $\top$ is the **transpose**, defined properly in section 6; for now read it as the mark that turns a column on its side. The result is a single number, which is what $\in \mathbb{R}$ is asserting.
+
 A column times a column is not defined; $x^\top z$ works because transposing $x$ makes it a $1 \times d$ row, and a $1 \times d$ times a $d \times 1$ is $1 \times 1$. The bookkeeping is not pedantry — it is what makes every later shape check mechanical.
 
 The inner product is **symmetric** ($x^\top z = z^\top x$) and **linear in each argument**:
@@ -73,7 +101,7 @@ Both follow immediately from the definition by splitting the sum. The geometric 
 
 ## 3. Matrices
 
-A **matrix** $A \in \mathbb{R}^{m \times n}$ is a rectangular array with $m$ rows and $n$ columns, with $A_{ij}$ the entry in row $i$, column $j$. Rows first, always.
+A **matrix** $A \in \mathbb{R}^{m \times n}$ — say "*A is in are, em by en*" — is a rectangular array with $m$ rows and $n$ columns, with $A_{ij}$ — "*A i jay*" — the entry in row $i$, column $j$. Rows first, always.
 
 Like vectors, matrices carry two readings, and confusing them is the single most common source of transposed-shape bugs:
 
@@ -113,7 +141,7 @@ This is the reading that makes $X\theta$ mean *"score every example."* Row $i$ o
 
 ### 4.2 The column reading
 
-Group the same double sum the other way. Writing $A_{:,j}$ for column $j$ of $A$,
+Group the same double sum the other way. Writing $A_{:,j}$ — say "*column jay of A*"; the colon means "all rows", borrowed from array-slicing notation — for column $j$ of $A$,
 
 $$
 Ax = x_1 A_{:,1} + x_2 A_{:,2} + \cdots + x_n A_{:,n}
@@ -233,6 +261,8 @@ X \in \mathbb{R}^{n \times d}, \qquad
 \text{row } i \text{ of } X \text{ is } \left( x^{(i)} \right)^\top
 $$
 
+Say it as "*capital X is in are, en by dee; row i of X is x i transpose*". The symbol $x^{(i)}$ is read "*x i*" — the parentheses around the index are there precisely so it is not mistaken for a power, since $x^2$ and $x^{(2)}$ mean entirely different things: the square of $x$, and the second example.
+
 $n$ examples down, $d$ features across. Examples are **rows**. This matches NumPy, pandas, and scikit-learn, so the mathematics and the code agree without a transpose sitting between them. A good deal of the literature uses the opposite convention; mixing the two is the most common way to produce a program that runs, returns the wrong shape, and gives no error.
 
 Note the small clash of readings: $x^{(i)}$ is a **column** vector in $\mathbb{R}^{d}$, but it appears in $X$ as a **row**. Hence the transpose in the line above. This is not an inconsistency to be fixed — it is the reason $X^\top$ appears as often as it does.
@@ -261,7 +291,7 @@ X\theta - y \in \mathbb{R}^{n}
 X^\top X \in \mathbb{R}^{d \times d}
 $$
 
-The first is every prediction. The second is every residual. The third is the **Gram matrix**, and it repays a close look.
+The first is every prediction. The second is every residual. The third, $X^\top X$ — say "*X transpose X*" — is the **Gram matrix** (rhymes with "programme"), and it repays a close look.
 
 Apply the outer-product reading of section 5 to $X^\top X$. The shared index runs over the $n$ examples, so
 

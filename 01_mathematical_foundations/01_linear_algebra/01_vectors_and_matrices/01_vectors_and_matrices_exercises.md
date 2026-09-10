@@ -2,7 +2,7 @@
 
 Attempt every problem before opening [the solutions](01_vectors_and_matrices_solutions.md). A worked solution you have read is not a problem you have solved.
 
-Notation follows [conventions.md](../../../OKF/conventions.md): vectors are columns, $X \in \mathbb{R}^{n \times d}$ has examples as rows, and $x^{(i)} \in \mathbb{R}^{d}$ is the $i$-th example.
+Notation follows [conventions.md](../../../OKF/conventions.md): vectors are columns, $X \in \mathbb{R}^{n \times d}$ has examples as rows, and $x^{(i)} \in \mathbb{R}^{d}$ is the $i$-th example. If a symbol is unfamiliar, the [symbol table](01_vectors_and_matrices.md#symbols-in-this-subtopic) at the top of the theory gives it a name and a pronunciation.
 
 Problems marked $\star$ are harder than the rest. They are not optional, but they are worth more time.
 

@@ -18,30 +18,30 @@ Fixed for the whole program. A subtopic that needs a symbol not listed here defi
 
 ### Symbols
 
-| Symbol | Meaning |
-|---|---|
-| $n$ | number of training examples |
-| $d$ | number of features, including the intercept coordinate |
-| $k$ | number of classes, clusters, or mixture components |
-| $x^{(i)} \in \mathbb{R}^{d}$ | the $i$-th training example |
-| $y^{(i)}$ | the label of the $i$-th example |
-| $x_j$ | the $j$-th feature of a generic example |
-| $X \in \mathbb{R}^{n \times d}$ | design matrix |
-| $y \in \mathbb{R}^{n}$ | label vector |
-| $\theta \in \mathbb{R}^{d}$ | model parameters |
-| $h_\theta(x)$ | hypothesis / model prediction |
-| $J(\theta)$ | the objective being minimized |
-| $L(\hat{y}, y)$ | per-example loss |
-| $\mathcal{L}(\theta)$ | likelihood |
-| $\ell(\theta)$ | log-likelihood |
-| $\alpha$ | learning rate |
-| $\lambda$ | regularization strength |
-| $\nabla_\theta J$ | gradient of $J$ with respect to $\theta$ |
-| $H$ | Hessian |
-| $\sigma(\cdot)$ | logistic sigmoid |
-| $\mathbf{1}[\cdot]$ | indicator function |
-| $\mathbb{E}[\cdot]$, $\mathrm{Var}(\cdot)$ | expectation, variance |
-| $\|\cdot\|_2$ | Euclidean norm |
+| Symbol | Say it | Meaning |
+|---|---|---|
+| $n$ | "en" | number of training examples |
+| $d$ | "dee" | number of features, including the intercept coordinate |
+| $k$ | "kay" | number of classes, clusters, or mixture components |
+| $x^{(i)} \in \mathbb{R}^{d}$ | "x i, in are dee" | the $i$-th training example |
+| $y^{(i)}$ | "y i" | the label of the $i$-th example |
+| $x_j$ | "x jay" | the $j$-th feature of a generic example |
+| $X \in \mathbb{R}^{n \times d}$ | "capital X, in are en by dee" | design matrix |
+| $y \in \mathbb{R}^{n}$ | "y, in are en" | label vector |
+| $\theta \in \mathbb{R}^{d}$ | "theta, in are dee" | model parameters |
+| $h_\theta(x)$ | "h theta of x" | hypothesis / model prediction |
+| $J(\theta)$ | "jay of theta" | the objective being minimized |
+| $L(\hat{y}, y)$ | "L of y hat, y" | per-example loss |
+| $\mathcal{L}(\theta)$ | "script L of theta" | likelihood |
+| $\ell(\theta)$ | "ell of theta" | log-likelihood |
+| $\alpha$ | "alpha" | learning rate |
+| $\lambda$ | "lambda" | regularization strength |
+| $\nabla_\theta J$ | "grad theta J" | gradient of $J$ with respect to $\theta$ |
+| $H$ | "capital H" | Hessian |
+| $\sigma(\cdot)$ | "sigma of" | logistic sigmoid |
+| $\mathbf{1}[\cdot]$ | "indicator of" | indicator function |
+| $\mathbb{E}[\cdot]$, $\mathrm{Var}(\cdot)$ | "expectation of", "variance of" | expectation, variance |
+| $\|\cdot\|_2$ | "the two-norm of" | Euclidean norm |
 
 ### Rules
 
@@ -52,6 +52,44 @@ Fixed for the whole program. A subtopic that needs a symbol not listed here defi
 5. **Indices.** Example index is a parenthesized superscript, $x^{(i)}$. Feature and component indices are subscripts, $x_j$, $\theta_j$. Iteration/step index is a bracketed superscript, $\theta^{[t]}$.
 6. **Transpose is `^\top`**, rendering $\theta^{\top}$ — not `^T`.
 7. **Estimates and predictions take hats:** $\hat{\theta}$, $\hat{y}$.
+
+### Reading notation aloud
+
+A reader who cannot say a symbol cannot hold it in their head. These are the spoken forms used throughout; they are fixed so that a symbol is never given two different names in two different subtopics.
+
+| Written | Say it |
+|---|---|
+| $\mathbb{R}^{d}$ | "are dee" — the space of $d$-dimensional real vectors |
+| $x \in \mathbb{R}^{d}$ | "x is in are dee" — $x$ is a $d$-dimensional real vector |
+| $\mathbb{R}^{n \times d}$ | "are, en by dee" — real matrices with $n$ rows and $d$ columns |
+| $x^{(i)}$ | "x i" — the parentheses mark an index, not a power |
+| $x_j$ | "x jay" — a subscript index |
+| $\theta^{[t]}$ | "theta at step t" |
+| $A_{ij}$ | "A i jay" — the entry in row $i$, column $j$ |
+| $A_{:,j}$ | "A, all rows, column jay" — often just "column jay of A" |
+| $A^\top$ | "A transpose" |
+| $A^{-1}$ | "A inverse" |
+| $\hat{\theta}$ | "theta hat" |
+| $\bar{x}$ | "x bar" |
+| $\sum_{i=1}^{n}$ | "sum from i equals one to en" |
+| $\prod$ | "product" |
+| $\partial$ | "partial" |
+| $\nabla$ | "grad", or "del" |
+| $\propto$ | "is proportional to" |
+| $\approx$ | "is approximately" |
+| $\forall$, $\exists$ | "for all", "there exists" |
+
+Greek letters, in the order the program meets them:
+
+| Letter | Say it | Letter | Say it |
+|---|---|---|---|
+| $\theta$ | "theta" | $\mu$ | "mew" |
+| $\alpha$ | "alpha" | $\sigma$, $\Sigma$ | "sigma", "capital sigma" |
+| $\beta$ | "beta" | $\epsilon$ | "epsilon" |
+| $\lambda$ | "lambda" | $\phi$ | "fye" |
+| $\gamma$ | "gamma" | $\pi$ | "pie" |
+| $\delta$, $\Delta$ | "delta", "capital delta" | $\rho$ | "roe" |
+| $\eta$ | "eta" | $\tau$ | "tau" |
 
 ## 2. Math rendering
 
@@ -144,7 +182,8 @@ Every implementation ships with `test_{subtopic_name}.py`:
 
 ## 6. Prose
 
-- The theory file opens with **why the problem exists** before any formalism.
+- The theory file opens with a **symbol table** — every symbol the subtopic uses, how it is spoken, and what it is called — and then with **why the problem exists**, before any formalism.
+- **Every symbol is glossed at its first appearance in prose**, giving how it is said aloud and the name a person would use for it out loud: "the product $X\theta$ — say *X theta*, the design matrix times the parameter vector". Only the first appearance, and only for symbols new to the subtopic. A reader who cannot pronounce an expression cannot rehearse it, and cannot ask anyone about it.
 - One idea per section; heading levels do not skip.
 - Derivations show intermediate steps. A step justified by a non-obvious identity names the identity.
 - British/American spelling is not policed; be consistent within a file.
